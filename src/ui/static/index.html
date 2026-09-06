@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FaceTrace — Premium Digital Forensic Verification Workstation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <!-- Atmospheric Gradient Lighting -->
+  <div class="ambient-glow glow-top" aria-hidden="true"></div>
+  <div class="ambient-glow glow-accent" aria-hidden="true"></div>
+
+  <!-- Sticky Glass Navigation Header -->
+  <header class="workstation-header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <div class="brand-logo">
+          <div class="logo-symbol">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"></polygon>
+              <circle cx="12" cy="12" r="3.5"></circle>
+              <line x1="12" y1="2" x2="12" y2="5"></line>
+              <line x1="12" y1="19" x2="12" y2="22"></line>
+            </svg>
+          </div>
+          <div>
+            <div class="brand-title-wrap">
+              <span class="brand-title">FACETRACE</span>
+              <span class="brand-tag">FORENSIC SAAS</span>
+            </div>
+            <p class="brand-tagline">DISCOVER → VERIFY → ANCHOR → PROVE</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-telemetry">
+        <div class="telemetry-pill network-pill" id="networkPill">
+          <span class="pulse-indicator"></span>
+          <span class="pill-label">NETWORK</span>
+          <span class="pill-val" id="networkPillVal">Base Sepolia #84532</span>
+        </div>
+        <div class="telemetry-pill contract-pill">
+          <span class="pill-label">REGISTRY</span>
+          <span class="pill-val mono">0x71fc...455a</span>
+        </div>
+        <div class="mode-select-wrapper">
+          <label for="executionModeSelect" class="sr-only">Execution Mode</label>
+          <select id="executionModeSelect" class="mode-selector">
+            <option value="live" selected>LIVE (Base Sepolia)</option>
+            <option value="mock">MOCK — TEST ONLY</option>
+            <option value="dry_run">DRY RUN (Simulation)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workstation Layout -->
+  <main class="workstation-container">
+
+    <!-- HERO / PRODUCT CONTEXT -->
+    <section class="hero-section">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        <span>VERIFIABLE EVIDENCE WORKSTATION</span>
+      </div>
+      <h1 class="hero-headline">TRACE THE EVIDENCE.</h1>
+      <p class="hero-subheading">
+        Discover public web evidence. Verify it independently. Anchor its integrity.
+      </p>
+      <div class="hero-compliance-notice">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <span><strong>PRD FR-01 Compliance:</strong> Use only a face image you have permission to process. Biometric material is processed locally and raw face data is not stored on-chain.</span>
+      </div>
+    </section>
+
+    <!-- SCREEN 1: Input Specimen & Primary Verification Workbench -->
+    <section id="screen1-input" class="panel workstation-panel input-section">
+      <div class="panel-header">
+        <div class="panel-title-group">
+          <span class="step-badge">[1] SPECIMEN & CONSENT</span>
+          <h2 class="panel-title">Subject Query Specimen</h2>
+        </div>
+        <div class="status-indicator" id="inputStatusBadge">READY</div>
+      </div>
+
+      <div class="panel-body input-grid">
+        <!-- Sample Selection & Controls -->
+        <div class="input-controls">
+          <div class="control-header-row">
+            <label class="control-label">BENCHMARK CONSENTED SAMPLES</label>
+            <span class="control-sublabel">Task 3 Calibrated Specimens</span>
+          </div>
+
+          <div class="sample-cards" id="sampleCardsContainer">
+            <!-- Populated dynamically via JS -->
+            <div class="sample-card active" data-sample="obama_ama.jpg">
+              <div class="sample-thumb-wrapper">
+                <img src="/samples/obama_ama.jpg" alt="Barack Obama AMA" class="sample-thumb">
+              </div>
+              <div class="sample-info">
+                <div class="sample-name">Barack Obama — Reddit AMA</div>
+                <div class="sample-desc">Consented benchmark photo (Task 3 verified)</div>
+              </div>
+              <div class="sample-check">✓</div>
+            </div>
+
+            <div class="sample-card" data-sample="daniel_craig.jpg">
+              <div class="sample-thumb-wrapper">
+                <img src="/samples/daniel_craig.jpg" alt="Daniel Craig" class="sample-thumb">
+              </div>
+              <div class="sample-info">
+                <div class="sample-name">Daniel Craig — Calibration</div>
+                <div class="sample-desc">ArcFace geometric calibration portrait</div>
+              </div>
+              <div class="sample-check">✓</div>
+            </div>
+          </div>
+
+          <!-- Consent Checkbox Box -->
+          <div class="consent-box">
+            <label class="checkbox-container">
+              <input type="checkbox" id="consentCheckbox" checked>
+              <span class="checkmark"></span>
+              <span class="consent-text">
+                <strong>Subject Consent Confirmed:</strong> Use only a face image you have permission to process (PRD FR-01 Compliance).
+              </span>
+            </label>
+            <div class="privacy-note-text">
+              Biometric embeddings are evaluated in-memory only. No face vectors or raw imagery are stored on-chain.
+            </div>
+          </div>
+
+          <!-- Primary Action CTA -->
+          <div class="action-row">
+            <button id="verifyBtn" class="btn btn-primary">
+              <span class="btn-icon">▶</span> VERIFY FACE
+            </button>
+            <div class="action-subtext">
+              Dispatches live image-provenance discovery, independent ArcFace biometrics, and Base Sepolia integrity anchoring. No Web3 wallet required.
+            </div>
+          </div>
+        </div>
+
+        <!-- Query Image Preview Card -->
+        <div class="input-preview-card">
+          <div class="preview-header">
+            <span class="preview-label">TARGET QUERY SPECIMEN</span>
+            <span class="badge badge-subtle" id="querySpecimenDimensions">640 × 640</span>
+          </div>
+          <div class="preview-viewport">
+            <img id="queryPreviewImg" src="/samples/obama_ama.jpg" alt="Query face" class="preview-img">
+            <div class="reticle-overlay">
+              <div class="reticle-crosshair top-left"></div>
+              <div class="reticle-crosshair top-right"></div>
+              <div class="reticle-crosshair bottom-left"></div>
+              <div class="reticle-crosshair bottom-right"></div>
+              <div class="reticle-center"></div>
+            </div>
+          </div>
+          <div class="preview-footer">
+            <span class="preview-footnote">Local ArcFace 512-D Normalization</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: Live Verification Chronological Pipeline -->
+    <section id="screen2-pipeline" class="panel workstation-panel pipeline-section">
+      <div class="panel-header">
+        <div class="panel-title-group">
+          <span class="step-badge">[2] VERIFICATION PIPELINE</span>
+          <h2 class="panel-title">Chronological Evidence Chain</h2>
+        </div>
+        <div class="timer-badge" id="pipelineTimer">00.0s</div>
+      </div>
+
+      <div class="panel-body">
+        <!-- 7-Stage Pipeline Track -->
+        <div class="pipeline-track" id="pipelineTrack">
+          <!-- Stage 1 -->
+          <div class="pipeline-node" id="node-FACE_DETECTION" data-stage="FACE_DETECTION">
+            <div class="node-header">
+              <span class="node-num">01</span>
+              <span class="node-status-badge badge-pending">PENDING</span>
+            </div>
+            <div class="node-label">FACE DETECTION</div>
+            <div class="node-detail">ArcFace 512-dim embedding</div>
+          </div>
+          <div class="pipeline-connector"></div>
+
+          <!-- Stage 2 -->
+          <div class="pipeline-node" id="node-WEB_DISCOVERY" data-stage="WEB_DISCOVERY">
+            <div class="node-header">
+              <span class="node-num">02</span>
+              <span class="node-status-badge badge-pending">PENDING</span>
+            </div>
+            <div class="node-label">WEB DISCOVERY</div>
+            <div class="node-detail">Google Cloud Vision Search</div>
+          </div>
+          <div class="pipeline-connector"></div>
+
+          <!-- Stage 3 -->
+          <div class="pipeline-node" id="node-SOCIAL_POST" data-stage="SOCIAL_POST">
+            <div class="node-header">
+              <span class="node-num">03</span>
+              <span class="node-status-badge badge-pending">PENDING</span>
+            </div>
+            <div class="node-label">SOCIAL POST</div>
+            <div class="node-detail">Platform & post URL filter</div>
+          </div>
+          <div class="pipeline-connector"></div>
+
+          <!-- Stage 4 -->
+          <div class="pipeline-node" id="node-INDEPENDENT_VERIFICATION" data-stage="INDEPENDENT_VERIFICATION">
+            <div class="node-header">
+              <span class="node-num">04</span>
+              <span class="node-status-badge badge-pending">PENDING</span>
+            </div>
+            <div class="node-label">INDEPENDENT VERIFY</div>
+            <div class="node-detail">ArcFace cosine sim ≥ 0.72</div>
+          </div>
+          <div class="pipeline-connector"></div>
+
+          <!-- Stage 5 -->
+          <div class="pipeline-node" id="node-EVIDENCE_COMMITMENT" data-stage="EVIDENCE_COMMITMENT">
+            <div class="node-header">
+              <span class="node-num">05</span>
+              <span class="node-status-badge badge-pending">PENDING</span>
+            </div>
+            <div class="node-label">EVIDENCE COMMITMENT</div>
+            <div class="node-detail">Canonical SHA-256 hash</div>
+          </div>
+          <div class="pipeline-connector"></div>
+
+          <!-- Stage 6 -->
+          <div class="pipeline-node" id="node-BLOCKCHAIN" data-stage="BLOCKCHAIN">
+            <div class="node-header">
+              <span class="node-num">06</span>
+              <span class="node-status-badge badge-pending">PENDING</span>
+            </div>
+            <div class="node-label">BLOCKCHAIN</div>
+            <div class="node-detail">Base Sepolia readback match</div>
+          </div>
+          <div class="pipeline-connector"></div>
+
+          <!-- Stage 7 -->
+          <div class="pipeline-node" id="node-INTEGRITY_CHECK" data-stage="INTEGRITY_CHECK">
+            <div class="node-header">
+              <span class="node-num">07</span>
+              <span class="node-status-badge badge-pending">PENDING</span>
+            </div>
+            <div class="node-label">INTEGRITY CHECK</div>
+            <div class="node-detail">Tamper simulation check</div>
+          </div>
+        </div>
+
+        <!-- Real-Time Activity Feed Log -->
+        <div class="activity-feed">
+          <span class="feed-prefix">STATUS</span>
+          <span class="feed-divider">|</span>
+          <span class="feed-text" id="statusMessageText">Workstation ready. Select consenting face specimen and click VERIFY FACE.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAILURE BANNER (Shown only on error) -->
+    <div id="errorBanner" class="error-banner" style="display: none;">
+      <div class="error-icon">✕</div>
+      <div class="error-content">
+        <div class="error-title" id="errorTitle">VERIFICATION FAILURE</div>
+        <div class="error-reason" id="errorReason">Detailed failure reason</div>
+        <div class="error-action" id="errorAction">Recommended action</div>
+      </div>
+    </div>
+
+    <!-- EVIDENCE RESULTS GRID (Screens 3, 4, 5, 6 + Trust Architecture) -->
+    <div id="resultsWrapper" class="results-grid" style="display: none;">
+
+      <!-- METHODOLOGY TRUST PANEL: How FaceTrace Proves the Result -->
+      <section id="trust-panel" class="panel workstation-panel trust-panel-card">
+        <div class="panel-header">
+          <div class="panel-title-group">
+            <span class="step-badge">TRUST ARCHITECTURE</span>
+            <h3 class="panel-title">HOW FACETRACE PROVES THE RESULT</h3>
+          </div>
+          <div class="badge badge-subtle">PROVENANCE + LOCAL BIOMETRICS + BLOCKCHAIN</div>
+        </div>
+        <div class="panel-body trust-grid">
+          <div class="trust-step">
+            <div class="trust-step-header">
+              <span class="trust-num">1 — DISCOVER</span>
+            </div>
+            <div class="trust-desc">Live image provenance</div>
+          </div>
+          <div class="trust-step">
+            <div class="trust-step-header">
+              <span class="trust-num">2 — VERIFY</span>
+            </div>
+            <div class="trust-desc">Independent local ArcFace comparison</div>
+          </div>
+          <div class="trust-step">
+            <div class="trust-step-header">
+              <span class="trust-num">3 — ANCHOR</span>
+            </div>
+            <div class="trust-desc">SHA-256 commitment recorded on Base Sepolia</div>
+          </div>
+          <div class="trust-step">
+            <div class="trust-step-header">
+              <span class="trust-num">4 — PROVE</span>
+            </div>
+            <div class="trust-desc">Recompute the commitment and compare it with the on-chain record</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 3: Discovery Result (Centerpiece) -->
+      <section id="screen3-discovery" class="panel workstation-panel discovery-panel">
+        <div class="panel-header">
+          <div class="panel-title-group">
+            <span class="step-badge">[3] DISCOVERY RESULT</span>
+            <h3 class="panel-title">Web Evidence Candidate</h3>
+          </div>
+          <div class="badge badge-info" id="complianceBadge">IMAGE PROVENANCE</div>
+        </div>
+
+        <div class="panel-body candidate-layout">
+          <div class="candidate-media-col">
+            <div class="media-preview-box">
+              <img id="candidateImagePreview" src="" alt="Candidate image" class="candidate-img">
+              <div class="media-badge">DISCOVERED IMAGE</div>
+            </div>
+          </div>
+          <div class="candidate-meta-col">
+            <div class="meta-row">
+              <span class="meta-label">DISCOVERY TYPE</span>
+              <span class="meta-val font-semibold text-primary">IMAGE PROVENANCE</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">PLATFORM</span>
+              <span class="meta-val platform-tag" id="candidatePlatform">Reddit</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">POST TITLE</span>
+              <span class="meta-val font-semibold" id="candidatePostTitle">Barack Obama is left handed</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">SOURCE URL</span>
+              <a id="candidatePostUrl" href="#" target="_blank" rel="noopener noreferrer" class="meta-val meta-link mono">https://reddit.com/...</a>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">IMAGE URL</span>
+              <a id="candidateImageUrl" href="#" target="_blank" rel="noopener noreferrer" class="meta-val meta-link mono">http://allthingsd.com/...</a>
+            </div>
+            <div class="badge-row">
+              <span class="pill pill-info">IMAGE PROVENANCE</span>
+              <span class="pill pill-success">VERIFIED EXACT</span>
+              <span class="pill pill-success" id="faceSimPill">SIMILARITY: 1.0000</span>
+            </div>
+            <p class="provenance-disclaimer">
+              "Candidate discovered through live reverse-image provenance."
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 4: Independent Face Verification (Evidence Section) -->
+      <section id="screen4-evidence" class="panel workstation-panel evidence-panel">
+        <div class="panel-header">
+          <div class="panel-title-group">
+            <span class="step-badge">[4] INDEPENDENT FACE VERIFICATION</span>
+            <h3 class="panel-title">Independent Face Verification</h3>
+          </div>
+          <div class="badge badge-success">DECISION: VERIFIED</div>
+        </div>
+
+        <div class="panel-body">
+          <!-- Stat Highlight Bar -->
+          <div class="metrics-summary-bar">
+            <div class="metric-item">
+              <span class="metric-label">FACES DETECTED</span>
+              <span class="metric-value font-semibold">1 Face</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label">SIMILARITY</span>
+              <span class="metric-value font-semibold text-primary" id="metricsSimVal">1.0000</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label">THRESHOLD</span>
+              <span class="metric-value font-mono">≥ 0.72</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label">DECISION</span>
+              <span class="metric-value"><span class="badge badge-success">VERIFIED</span></span>
+            </div>
+          </div>
+
+          <div class="evidence-explanation-callout">
+            "Local ArcFace comparison passed the configured verification threshold."
+          </div>
+
+          <!-- High Quality Evidence Matrix -->
+          <div class="evidence-matrix-wrapper">
+            <div class="matrix-header-title">EVIDENCE MATRIX</div>
+            <div class="table-responsive">
+              <table class="evidence-table">
+                <thead>
+                  <tr>
+                    <th>EVIDENCE PROPERTY</th>
+                    <th>TECHNICAL VALUE</th>
+                    <th>EVALUATION METHOD</th>
+                    <th>STATUS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Source</td>
+                    <td id="evidenceSourceVal">Reddit (r/southpaws)</td>
+                    <td>Live Web Provenance</td>
+                    <td><span class="status-pill pill-success">INDEXED</span></td>
+                  </tr>
+                  <tr>
+                    <td>Post URL</td>
+                    <td><a id="evidencePostUrlLink" href="#" target="_blank" rel="noopener noreferrer" class="meta-link mono">https://www.reddit.com/...</a></td>
+                    <td>Reverse-Image Occurrence</td>
+                    <td><span class="status-pill pill-success">PUBLIC POST</span></td>
+                  </tr>
+                  <tr>
+                    <td>Image SHA-256</td>
+                    <td class="mono" id="tableShaCandidate">0x1f2e49a7c034d578add5b8bb4e307fdc0b50c7ba67dad5dc0e04a1b45c244f4d</td>
+                    <td>Cryptographic Digest</td>
+                    <td><span class="status-pill pill-success" id="tableExactMatchBadge">EXACT MATCH</span></td>
+                  </tr>
+                  <tr>
+                    <td>Perceptual Hash</td>
+                    <td class="mono" id="tablePhashDist">Hamming distance 0 (threshold ≤ 10)</td>
+                    <td>Perceptual Visual Invariant</td>
+                    <td><span class="status-pill pill-success">IDENTICAL</span></td>
+                  </tr>
+                  <tr>
+                    <td>Face Similarity</td>
+                    <td class="mono" id="tableFaceSim">1.0000 (threshold ≥ 0.72)</td>
+                    <td>ArcFace 512-D Cosine Sim</td>
+                    <td><span class="status-pill pill-success">PASS</span></td>
+                  </tr>
+                  <tr>
+                    <td>Verification State</td>
+                    <td><span class="badge badge-success">VERIFIED EXACT</span></td>
+                    <td>Multi-Layer Forensic Protocol</td>
+                    <td><span class="status-pill pill-success">VERIFIED</span></td>
+                  </tr>
+                  <tr>
+                    <td>Timestamp</td>
+                    <td class="mono" id="evidenceTimestamp">2026-09-06T12:25:39Z</td>
+                    <td>Pipeline Execution Time</td>
+                    <td><span class="status-pill pill-info">ANCHORED</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Expandable Technical Drawer -->
+            <details class="technical-drawer">
+              <summary class="drawer-summary">
+                <span>View Full Technical Identifiers & Cryptographic Attributes</span>
+                <span class="drawer-toggle-icon">▼</span>
+              </summary>
+              <div class="drawer-content">
+                <div class="tech-attr-grid">
+                  <div class="tech-attr-item">
+                    <span class="tech-attr-label">CANONICAL HASH ALGORITHM</span>
+                    <span class="tech-attr-val mono">SHA-256 (Deterministic JSON Canonicalization)</span>
+                  </div>
+                  <div class="tech-attr-item">
+                    <span class="tech-attr-label">BIOMETRIC EMBEDDING MODEL</span>
+                    <span class="tech-attr-val mono">ArcFace ResNet-50 (512-dim Normalized)</span>
+                  </div>
+                  <div class="tech-attr-item">
+                    <span class="tech-attr-label">COMPLIANCE POLICY</span>
+                    <span class="tech-attr-val mono">PRD FR-01 Explicit Consent Verified</span>
+                  </div>
+                  <div class="tech-attr-item">
+                    <span class="tech-attr-label">REGISTRY METHOD</span>
+                    <span class="tech-attr-val mono">verifyEvidence(bytes32)</span>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 5: Evidence Integrity (Blockchain Card) -->
+      <section id="screen5-blockchain" class="panel workstation-panel blockchain-panel">
+        <div class="panel-header">
+          <div class="panel-title-group">
+            <span class="step-badge">[5] EVIDENCE INTEGRITY</span>
+            <h3 class="panel-title">Evidence Integrity</h3>
+          </div>
+          <div class="badge badge-success" id="bcStatusPill">LIVE_BLOCKCHAIN_VERIFIED</div>
+        </div>
+
+        <div class="panel-body blockchain-layout">
+          <div class="blockchain-grid">
+            <div class="bc-stat-box">
+              <span class="bc-stat-label">NETWORK</span>
+              <span class="bc-stat-value">Base Sepolia</span>
+            </div>
+            <div class="bc-stat-box">
+              <span class="bc-stat-label">CHAIN ID</span>
+              <span class="bc-stat-value mono">84532</span>
+            </div>
+            <div class="bc-stat-box">
+              <span class="bc-stat-label">BLOCK NUMBER</span>
+              <span class="bc-stat-value mono" id="bcBlockNumber">46459229</span>
+            </div>
+            <div class="bc-stat-box">
+              <span class="bc-stat-label">ANCHOR MODE</span>
+              <span class="bc-stat-value badge badge-neutral" id="bcAnchorMode">EXISTING_RECOVERY</span>
+            </div>
+          </div>
+
+          <div class="bc-detail-rows">
+            <div class="bc-row">
+              <span class="bc-row-label">CONTRACT ADDRESS</span>
+              <span class="bc-row-val mono" id="bcContractAddr">0x71fcDeb36659E264716618b3E3a7C142Ff42455a</span>
+            </div>
+            <div class="bc-row">
+              <span class="bc-row-label">EVIDENCE COMMITMENT</span>
+              <span class="bc-row-val mono" id="bcEvidenceHash">0x1f2e49a7c034d578add5b8bb4e307fdc0b50c7ba67dad5dc0e04a1b45c244f4d</span>
+              <div class="bc-field-note">The SHA-256 commitment of this evidence matches the commitment recorded on-chain.</div>
+            </div>
+            <div class="bc-row">
+              <span class="bc-row-label">TRANSACTION HASH</span>
+              <span class="bc-row-val mono" id="bcTxHash">0x48e3b99c03504f08005eaf60a25073e76ad75401e310c50f27fbd208275077d7</span>
+            </div>
+          </div>
+
+          <div class="anchor-explanation-box">
+            <strong>Anchor Mode (EXISTING_RECOVERY):</strong> This evidence commitment was already anchored on Base Sepolia; FaceTrace recovered and independently re-verified the existing transaction instead of creating a duplicate.
+          </div>
+
+          <div class="bc-actions">
+            <a id="basescanTxBtn" href="https://sepolia.basescan.org/tx/0x48e3b99c03504f08005eaf60a25073e76ad75401e310c50f27fbd208275077d7" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+              <span class="btn-icon">↗</span> VIEW ON BASESCAN
+            </a>
+            <span class="bc-notice">Blockchain verifies evidence integrity, not human identity.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 6: Integrity & Tamper Test -->
+      <section id="screen6-tamper" class="panel workstation-panel tamper-panel">
+        <div class="panel-header">
+          <div class="panel-title-group">
+            <span class="step-badge">[6] TAMPER DEMONSTRATION</span>
+            <h3 class="panel-title">Cryptographic Tamper Verification</h3>
+          </div>
+          <div class="badge badge-warning" id="tamperBadge">TAMPER DETECTED</div>
+        </div>
+
+        <div class="panel-body">
+          <div class="tamper-demonstration-grid">
+            <!-- Authentic Scenario -->
+            <div class="tamper-card authentic-card">
+              <div class="tamper-card-header">
+                <span class="tamper-card-title">ORIGINAL EVIDENCE CHECK</span>
+                <span class="status-pill pill-success">MATCH ✓</span>
+              </div>
+              <div class="tamper-card-body">
+                <div class="tamper-property">
+                  <span class="tamper-prop-label">ORIGINAL EVIDENCE</span>
+                  <span class="tamper-prop-val mono" id="tamperH1Orig">H1: 0x1f2e49a7c034...</span>
+                </div>
+                <div class="tamper-property">
+                  <span class="tamper-prop-label">ON-CHAIN COMMITMENT</span>
+                  <span class="tamper-prop-val mono" id="tamperH1Onchain">H1: 0x1f2e49a7c034...</span>
+                </div>
+                <div class="tamper-result-line result-match">
+                  <span class="match-icon">✓</span>
+                  <span><strong>MATCH:</strong> Original evidence digest equals on-chain commitment.</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tampered Scenario -->
+            <div class="tamper-card tampered-card">
+              <div class="tamper-card-header">
+                <span class="tamper-card-title">MODIFIED SPECIMEN CHECK</span>
+                <span class="status-pill pill-danger">TAMPER DETECTED</span>
+              </div>
+              <div class="tamper-card-body">
+                <div class="tamper-property">
+                  <span class="tamper-prop-label">MODIFIED EVIDENCE</span>
+                  <span class="tamper-prop-val mono" id="tamperH2Mod">H2: 0x104fffc5895d...</span>
+                </div>
+                <div class="tamper-property">
+                  <span class="tamper-prop-label">ON-CHAIN COMMITMENT</span>
+                  <span class="tamper-prop-val mono" id="tamperH2Onchain">H1: 0x1f2e49a7c034...</span>
+                </div>
+                <div class="tamper-result-line result-tamper">
+                  <span class="tamper-icon">≠</span>
+                  <span><strong>H2 ≠ H1:</strong> Altered evidence produces cryptographic mismatch. <strong>TAMPER DETECTED</strong>.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tamper-summary-note">
+            Recomputing the SHA-256 commitment over modified evidence yields <span class="mono" id="tamperInlineH2">H2</span> which does not match on-chain record <span class="mono" id="tamperInlineH1">H1</span>.
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- SCREEN 7: Final Result & Reset Bar -->
+    <section id="screen7-final" class="final-summary-bar" style="display: none;">
+      <div class="final-summary-content">
+        <div class="final-badge-title">
+          <span class="check-icon">✓</span>
+          <h2>EVIDENCE VERIFIED</h2>
+        </div>
+        <p class="final-subtitle">Candidate discovered through live reverse-image provenance and independently face-verified.</p>
+        <div class="final-checklist">
+          <span class="check-item"><span class="check-dot">✓</span> <strong>DISCOVERY:</strong> Live web evidence discovered</span>
+          <span class="check-item"><span class="check-dot">✓</span> <strong>FACE CHECK:</strong> Independent face verification passed</span>
+          <span class="check-item"><span class="check-dot">✓</span> <strong>COMMITMENT:</strong> Evidence commitment generated</span>
+          <span class="check-item"><span class="check-dot">✓</span> <strong>INTEGRITY:</strong> Blockchain commitment matched</span>
+          <span class="check-item"><span class="check-dot">✓</span> <strong>TAMPER TEST:</strong> Tamper modification detected</span>
+        </div>
+      </div>
+      <div class="final-actions">
+        <a id="finalViewPostBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">VIEW SOURCE</a>
+        <a id="finalViewProofBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">VIEW BLOCKCHAIN PROOF</a>
+        <button id="newVerificationBtn" class="btn btn-primary">NEW VERIFICATION</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Client State Script -->
+  <script src="/static/app.js"></script>
+</body>
+</html>

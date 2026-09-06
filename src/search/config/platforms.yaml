@@ -1,0 +1,98 @@
+# Social media platforms configuration for domain classification and post-like URL detection
+platforms:
+  instagram:
+    name: "instagram"
+    domains:
+      - "instagram.com"
+      - "www.instagram.com"
+      - "m.instagram.com"
+    post_path_patterns:
+      - "^/p/[A-Za-z0-9_-]+"
+      - "^/reel/[A-Za-z0-9_-]+"
+      - "^/tv/[A-Za-z0-9_-]+"
+
+  x:
+    name: "x"
+    domains:
+      - "x.com"
+      - "www.x.com"
+      - "twitter.com"
+      - "www.twitter.com"
+      - "mobile.twitter.com"
+    post_path_patterns:
+      - "^/[A-Za-z0-9_]+/status/[0-9]+"
+
+  reddit:
+    name: "reddit"
+    domains:
+      - "reddit.com"
+      - "www.reddit.com"
+      - "old.reddit.com"
+    post_path_patterns:
+      - "^/r/[A-Za-z0-9_]+/comments/[A-Za-z0-9]+"
+
+  linkedin:
+    name: "linkedin"
+    domains:
+      - "linkedin.com"
+      - "www.linkedin.com"
+    post_path_patterns:
+      - "^/posts/[A-Za-z0-9_-]+"
+      - "^/feed/update/[A-Za-z0-9_:-]+"
+
+  facebook:
+    name: "facebook"
+    domains:
+      - "facebook.com"
+      - "www.facebook.com"
+      - "m.facebook.com"
+      - "fb.watch"
+    post_path_patterns:
+      - "^/[A-Za-z0-9._-]+/posts/[0-9]+"
+      - "^/permalink.php"
+      - "^/photo.php"
+      - "^/photos/"
+      - "^/watch/"
+
+  tiktok:
+    name: "tiktok"
+    domains:
+      - "tiktok.com"
+      - "www.tiktok.com"
+    post_path_patterns:
+      - "^/@[A-Za-z0-9._-]+/video/[0-9]+"
+
+  youtube:
+    name: "youtube"
+    domains:
+      - "youtube.com"
+      - "www.youtube.com"
+      - "m.youtube.com"
+    post_path_patterns:
+      - "^/watch"
+      - "^/shorts/[A-Za-z0-9_-]+"
+      - "^/post/[A-Za-z0-9_-]+"
+      - "^/video/[A-Za-z0-9_-]+"
+
+  youtu_be:
+    name: "youtube"
+    domains:
+      - "youtu.be"
+    post_path_patterns:
+      - "^/[A-Za-z0-9_-]{8,15}$"
+
+  threads:
+    name: "threads"
+    domains:
+      - "threads.net"
+      - "www.threads.net"
+    post_path_patterns:
+      - "^/@[A-Za-z0-9._-]+/post/[A-Za-z0-9_-]+"
+
+  pinterest:
+    name: "pinterest"
+    domains:
+      - "pinterest.com"
+      - "www.pinterest.com"
+    post_path_patterns:
+      - "^/pin/[0-9]+"

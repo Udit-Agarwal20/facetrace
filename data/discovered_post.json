@@ -1,0 +1,1619 @@
+{
+  "schema_version": "1.0",
+  "job_id": "ft_run_1788702634_26d9b7f2",
+  "status": "SOCIAL_POST_MATCH_FOUND",
+  "task3_compliance": {
+    "state": "TASK3_SOCIAL_MATCH",
+    "passed": true,
+    "failed_gates": [],
+    "reason": "Candidate was genuinely discovered during live external search, is a verified social post on Reddit, evidence was retrieved, and candidate face independently passed ArcFace verification (similarity: 1.0000)."
+  },
+  "search": {
+    "provider": "google_vision",
+    "discovery_type": "image_provenance",
+    "execution_mode": "LIVE_EXTERNAL_SEARCH",
+    "queries_executed": 2,
+    "provider_latency_ms": 1642.4
+  },
+  "selected_candidate": {
+    "candidate_id": "cand_4cb64bbd7a95",
+    "provider": "google_vision",
+    "query_variants": [
+      "original"
+    ],
+    "provider_match_type": "FULL",
+    "page_url": "https://www.reddit.com/r/southpaws/comments/z1yuo/i_knew_obama_was_a_lefty_but_im_surprised_he",
+    "image_url": "http://allthingsd.com/files/2012/08/Barack-Obama-Reddit.jpeg",
+    "page_title": "I knew Obama was a lefty, but I'm surprised he actually uses ... - Reddit",
+    "provider_score": 0.95,
+    "platform": "reddit",
+    "is_external_source": true,
+    "is_social_domain": true,
+    "is_post_url": true,
+    "retrieval_score": 1.545,
+    "retrieval": {
+      "source_reachable": true,
+      "evidence_retrieved": true,
+      "image_valid": true,
+      "error": null
+    },
+    "verification": {
+      "classification": "VERIFIED_EXACT",
+      "verification_state": "VERIFIED_EXACT",
+      "sha256_exact": true,
+      "sha256_candidate": "f8f141c421f4e52cc7255bc3741572659478a60b59ffe1fc888802661efc8e5e",
+      "phash_distance": 0,
+      "phash": {
+        "available": true,
+        "distance": 0
+      },
+      "face_verified": true,
+      "face_similarity": 1.0,
+      "faces_detected": 1,
+      "best_face_index": 0,
+      "face": {
+        "detected": true,
+        "verified": true,
+        "model": "ArcFace",
+        "similarity": 1.0,
+        "faces_detected": 1,
+        "selected_face_index": 0
+      },
+      "retrieval": {
+        "source_reachable": true,
+        "evidence_retrieved": true,
+        "image_valid": true,
+        "error": null
+      },
+      "explanation": "Byte-exact match: Candidate image SHA-256 is identical to query image."
+    },
+    "task3_compliance": {
+      "state": "TASK3_SOCIAL_MATCH",
+      "passed": true,
+      "failed_gates": [],
+      "reason": "Candidate was genuinely discovered during live external search, is a verified social post on Reddit, evidence was retrieved, and candidate face independently passed ArcFace verification (similarity: 1.0000)."
+    }
+  },
+  "retrieval": {
+    "source_reachable": true,
+    "evidence_retrieved": true,
+    "image_valid": true,
+    "error": null
+  },
+  "verification": {
+    "classification": "VERIFIED_EXACT",
+    "verification_state": "VERIFIED_EXACT",
+    "sha256_exact": true,
+    "sha256_candidate": "f8f141c421f4e52cc7255bc3741572659478a60b59ffe1fc888802661efc8e5e",
+    "phash_distance": 0,
+    "phash": {
+      "available": true,
+      "distance": 0
+    },
+    "face_verified": true,
+    "face_similarity": 1.0,
+    "faces_detected": 1,
+    "best_face_index": 0,
+    "face": {
+      "detected": true,
+      "verified": true,
+      "model": "ArcFace",
+      "similarity": 1.0,
+      "faces_detected": 1,
+      "selected_face_index": 0
+    },
+    "retrieval": {
+      "source_reachable": true,
+      "evidence_retrieved": true,
+      "image_valid": true,
+      "error": null
+    },
+    "explanation": "Byte-exact match: Candidate image SHA-256 is identical to query image."
+  },
+  "provenance": {
+    "discovered_at": "2026-09-06T13:50:35.508454+00:00",
+    "retrieved_at": "2026-09-06T13:50:44.582013+00:00",
+    "verified_at": "2026-09-06T13:50:44.582039+00:00",
+    "provider": "google_vision_web_detection",
+    "discovery_type": "image_provenance",
+    "execution_mode": "LIVE_EXTERNAL_SEARCH"
+  },
+  "all_candidates": [
+    {
+      "candidate_id": "cand_227c7314e721",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "FULL",
+      "page_url": "https://www.reddit.com/r/southpaws/comments/z1yuo/i_knew_obama_was_a_lefty_but_im_surprised_he",
+      "image_url": "https://external-preview.redd.it/i-knew-obama-was-a-lefty-but-im-surprised-he-actually-uses-v0--PFBxCH05SzHJVvDdBVyZZR4pgtZ_-H8iIgCZh78jl4.jpeg?width=640&crop=smart&auto=webp",
+      "page_title": "I knew Obama was a lefty, but I'm surprised he actually uses ... - Reddit",
+      "provider_score": 0.95,
+      "platform": "reddit",
+      "is_external_source": true,
+      "is_social_domain": true,
+      "is_post_url": true,
+      "retrieval_score": 1.545,
+      "retrieval": {
+        "source_reachable": false,
+        "evidence_retrieved": false,
+        "image_valid": false,
+        "error": "HTTP 403 fetching image from https://external-preview.redd.it/i-knew-obama-was-a-lefty-but-im-surprised-he-actually-uses-v0--PFBxCH05SzHJVvDdBVyZZR4pgtZ_-H8iIgCZh78jl4.jpeg?width=640&crop=smart&auto=webp"
+      },
+      "verification": {
+        "classification": "UNVERIFIED",
+        "verification_state": "UNVERIFIED",
+        "sha256_exact": false,
+        "sha256_candidate": null,
+        "phash_distance": null,
+        "phash": {
+          "available": false,
+          "distance": null
+        },
+        "face_verified": false,
+        "face_similarity": null,
+        "faces_detected": 0,
+        "best_face_index": null,
+        "face": {
+          "detected": false,
+          "verified": false,
+          "model": "ArcFace",
+          "similarity": null,
+          "faces_detected": 0,
+          "selected_face_index": null
+        },
+        "retrieval": {
+          "source_reachable": false,
+          "evidence_retrieved": false,
+          "image_valid": false,
+          "error": "HTTP 403 fetching image from https://external-preview.redd.it/i-knew-obama-was-a-lefty-but-im-surprised-he-actually-uses-v0--PFBxCH05SzHJVvDdBVyZZR4pgtZ_-H8iIgCZh78jl4.jpeg?width=640&crop=smart&auto=webp"
+        },
+        "explanation": "Candidate image unreachable: HTTP 403 fetching image from https://external-preview.redd.it/i-knew-obama-was-a-lefty-but-im-surprised-he-actually-uses-v0--PFBxCH05SzHJVvDdBVyZZR4pgtZ_-H8iIgCZh78jl4.jpeg?width=640&crop=smart&auto=webp"
+      },
+      "task3_compliance": {
+        "state": "INCONCLUSIVE",
+        "passed": false,
+        "failed_gates": [
+          "SOURCE_REACHABLE (HTTP 403 fetching image from https://external-preview.redd.it/i-knew-obama-was-a-lefty-but-im-surprised-he-actually-uses-v0--PFBxCH05SzHJVvDdBVyZZR4pgtZ_-H8iIgCZh78jl4.jpeg?width=640&crop=smart&auto=webp)",
+          "EVIDENCE_RETRIEVABLE (HTTP 403 fetching image from https://external-preview.redd.it/i-knew-obama-was-a-lefty-but-im-surprised-he-actually-uses-v0--PFBxCH05SzHJVvDdBVyZZR4pgtZ_-H8iIgCZh78jl4.jpeg?width=640&crop=smart&auto=webp)",
+          "VALID_CANDIDATE_IMAGE (HTTP 403 fetching image from https://external-preview.redd.it/i-knew-obama-was-a-lefty-but-im-surprised-he-actually-uses-v0--PFBxCH05SzHJVvDdBVyZZR4pgtZ_-H8iIgCZh78jl4.jpeg?width=640&crop=smart&auto=webp)",
+          "FACE_DETECTED (No face detected in candidate image)",
+          "ARCFACE_VERIFIED (Face similarity None does not meet verification threshold)"
+        ],
+        "reason": "Candidate evidence verification unavailable: Candidate image unreachable: HTTP 403 fetching image from https://external-preview.redd.it/i-knew-obama-was-a-lefty-but-im-surprised-he-actually-uses-v0--PFBxCH05SzHJVvDdBVyZZR4pgtZ_-H8iIgCZh78jl4.jpeg?width=640&crop=smart&auto=webp"
+      }
+    },
+    {
+      "candidate_id": "cand_4cb64bbd7a95",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "FULL",
+      "page_url": "https://www.reddit.com/r/southpaws/comments/z1yuo/i_knew_obama_was_a_lefty_but_im_surprised_he",
+      "image_url": "http://allthingsd.com/files/2012/08/Barack-Obama-Reddit.jpeg",
+      "page_title": "I knew Obama was a lefty, but I'm surprised he actually uses ... - Reddit",
+      "provider_score": 0.95,
+      "platform": "reddit",
+      "is_external_source": true,
+      "is_social_domain": true,
+      "is_post_url": true,
+      "retrieval_score": 1.545,
+      "retrieval": {
+        "source_reachable": true,
+        "evidence_retrieved": true,
+        "image_valid": true,
+        "error": null
+      },
+      "verification": {
+        "classification": "VERIFIED_EXACT",
+        "verification_state": "VERIFIED_EXACT",
+        "sha256_exact": true,
+        "sha256_candidate": "f8f141c421f4e52cc7255bc3741572659478a60b59ffe1fc888802661efc8e5e",
+        "phash_distance": 0,
+        "phash": {
+          "available": true,
+          "distance": 0
+        },
+        "face_verified": true,
+        "face_similarity": 1.0,
+        "faces_detected": 1,
+        "best_face_index": 0,
+        "face": {
+          "detected": true,
+          "verified": true,
+          "model": "ArcFace",
+          "similarity": 1.0,
+          "faces_detected": 1,
+          "selected_face_index": 0
+        },
+        "retrieval": {
+          "source_reachable": true,
+          "evidence_retrieved": true,
+          "image_valid": true,
+          "error": null
+        },
+        "explanation": "Byte-exact match: Candidate image SHA-256 is identical to query image."
+      },
+      "task3_compliance": {
+        "state": "TASK3_SOCIAL_MATCH",
+        "passed": true,
+        "failed_gates": [],
+        "reason": "Candidate was genuinely discovered during live external search, is a verified social post on Reddit, evidence was retrieved, and candidate face independently passed ArcFace verification (similarity: 1.0000)."
+      }
+    },
+    {
+      "candidate_id": "cand_d1e8b161a284",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "FULL",
+      "page_url": "https://www.reddit.com/r/southpaws/comments/z1yuo/i_knew_obama_was_a_lefty_but_im_surprised_he",
+      "image_url": "https://external-preview.redd.it/i-knew-obama-was-a-lefty-but-im-surprised-he-actually-uses-v0--PFBxCH05SzHJVvDdBVyZZR4pgtZ_-H8iIgCZh78jl4.jpeg?auto=webp",
+      "page_title": "I knew Obama was a lefty, but I'm surprised he actually uses ... - Reddit",
+      "provider_score": 0.95,
+      "platform": "reddit",
+      "is_external_source": true,
+      "is_social_domain": true,
+      "is_post_url": true,
+      "retrieval_score": 1.545,
+      "retrieval": {
+        "source_reachable": false,
+        "evidence_retrieved": false,
+        "image_valid": false,
+        "error": "HTTP 403 fetching image from https://external-preview.redd.it/i-knew-obama-was-a-lefty-but-im-surprised-he-actually-uses-v0--PFBxCH05SzHJVvDdBVyZZR4pgtZ_-H8iIgCZh78jl4.jpeg?auto=webp"
+      },
+      "verification": {
+        "classification": "UNVERIFIED",
+        "verification_state": "UNVERIFIED",
+        "sha256_exact": false,
+        "sha256_candidate": null,
+        "phash_distance": null,
+        "phash": {
+          "available": false,
+          "distance": null
+        },
+        "face_verified": false,
+        "face_similarity": null,
+        "faces_detected": 0,
+        "best_face_index": null,
+        "face": {
+          "detected": false,
+          "verified": false,
+          "model": "ArcFace",
+          "similarity": null,
+          "faces_detected": 0,
+          "selected_face_index": null
+        },
+        "retrieval": {
+          "source_reachable": false,
+          "evidence_retrieved": false,
+          "image_valid": false,
+          "error": "HTTP 403 fetching image from https://external-preview.redd.it/i-knew-obama-was-a-lefty-but-im-surprised-he-actually-uses-v0--PFBxCH05SzHJVvDdBVyZZR4pgtZ_-H8iIgCZh78jl4.jpeg?auto=webp"
+        },
+        "explanation": "Candidate image unreachable: HTTP 403 fetching image from https://external-preview.redd.it/i-knew-obama-was-a-lefty-but-im-surprised-he-actually-uses-v0--PFBxCH05SzHJVvDdBVyZZR4pgtZ_-H8iIgCZh78jl4.jpeg?auto=webp"
+      },
+      "task3_compliance": {
+        "state": "INCONCLUSIVE",
+        "passed": false,
+        "failed_gates": [
+          "SOURCE_REACHABLE (HTTP 403 fetching image from https://external-preview.redd.it/i-knew-obama-was-a-lefty-but-im-surprised-he-actually-uses-v0--PFBxCH05SzHJVvDdBVyZZR4pgtZ_-H8iIgCZh78jl4.jpeg?auto=webp)",
+          "EVIDENCE_RETRIEVABLE (HTTP 403 fetching image from https://external-preview.redd.it/i-knew-obama-was-a-lefty-but-im-surprised-he-actually-uses-v0--PFBxCH05SzHJVvDdBVyZZR4pgtZ_-H8iIgCZh78jl4.jpeg?auto=webp)",
+          "VALID_CANDIDATE_IMAGE (HTTP 403 fetching image from https://external-preview.redd.it/i-knew-obama-was-a-lefty-but-im-surprised-he-actually-uses-v0--PFBxCH05SzHJVvDdBVyZZR4pgtZ_-H8iIgCZh78jl4.jpeg?auto=webp)",
+          "FACE_DETECTED (No face detected in candidate image)",
+          "ARCFACE_VERIFIED (Face similarity None does not meet verification threshold)"
+        ],
+        "reason": "Candidate evidence verification unavailable: Candidate image unreachable: HTTP 403 fetching image from https://external-preview.redd.it/i-knew-obama-was-a-lefty-but-im-surprised-he-actually-uses-v0--PFBxCH05SzHJVvDdBVyZZR4pgtZ_-H8iIgCZh78jl4.jpeg?auto=webp"
+      }
+    },
+    {
+      "candidate_id": "cand_329b459ac18b",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "FULL",
+      "page_url": "https://www.youtube.com/watch?v=U76TSJ7ONzM",
+      "image_url": "https://i.ytimg.com/vi/U76TSJ7ONzM/maxresdefault.jpg",
+      "page_title": "Thanks Obama, Al Codes Better Than Most Developers - YouTube",
+      "provider_score": 0.8,
+      "platform": "youtube",
+      "is_external_source": true,
+      "is_social_domain": true,
+      "is_post_url": true,
+      "retrieval_score": 1.38,
+      "retrieval": {
+        "source_reachable": true,
+        "evidence_retrieved": true,
+        "image_valid": true,
+        "error": null
+      },
+      "verification": {
+        "classification": "PROBABLE_MATCH",
+        "verification_state": "PROBABLE_MATCH",
+        "sha256_exact": false,
+        "sha256_candidate": "893450a4dcd73dc20c0cf53b0a7a8c0ebe93fbdde566cddba784f93f5a5874fc",
+        "phash_distance": 38,
+        "phash": {
+          "available": true,
+          "distance": 38
+        },
+        "face_verified": false,
+        "face_similarity": 0.5745,
+        "faces_detected": 1,
+        "best_face_index": 0,
+        "face": {
+          "detected": true,
+          "verified": false,
+          "model": "ArcFace",
+          "similarity": 0.5745,
+          "faces_detected": 1,
+          "selected_face_index": 0
+        },
+        "retrieval": {
+          "source_reachable": true,
+          "evidence_retrieved": true,
+          "image_valid": true,
+          "error": null
+        },
+        "explanation": "Probable match: Candidate face similarity (0.5745) shows moderate correlation."
+      },
+      "task3_compliance": {
+        "state": "REJECTED",
+        "passed": false,
+        "failed_gates": [
+          "ARCFACE_VERIFIED (Face similarity 0.5745 does not meet verification threshold)"
+        ],
+        "reason": "Candidate failed Task 3 mandatory compliance gates: ARCFACE_VERIFIED (Face similarity 0.5745 does not meet verification threshold)"
+      }
+    },
+    {
+      "candidate_id": "cand_3d4486fa6a1c",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "FULL",
+      "page_url": "https://www.youtube.com/watch?v=6XvmhE1J9PY",
+      "image_url": "https://i.ytimg.com/vi/6XvmhE1J9PY/maxresdefault.jpg?sqp=-oaymwEmCIAKENAF8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGHIgVyg5MA8=&rs=AOn4CLBvkKR8AsnX_Kmgo0qw9KD6jPPnNg",
+      "page_title": "President Obama asks America to learn computer science - YouTube",
+      "provider_score": 0.8,
+      "platform": "youtube",
+      "is_external_source": true,
+      "is_social_domain": true,
+      "is_post_url": true,
+      "retrieval_score": 1.38,
+      "retrieval": {
+        "source_reachable": true,
+        "evidence_retrieved": true,
+        "image_valid": true,
+        "error": null
+      },
+      "verification": {
+        "classification": "UNVERIFIED",
+        "verification_state": "UNVERIFIED",
+        "sha256_exact": false,
+        "sha256_candidate": "7d8fbfd56796ac0ea757a5ecfafe5865b764ee4ff789af7b9eee55a076e91cb5",
+        "phash_distance": 34,
+        "phash": {
+          "available": true,
+          "distance": 34
+        },
+        "face_verified": false,
+        "face_similarity": 0.5274,
+        "faces_detected": 1,
+        "best_face_index": 0,
+        "face": {
+          "detected": true,
+          "verified": false,
+          "model": "ArcFace",
+          "similarity": 0.5274,
+          "faces_detected": 1,
+          "selected_face_index": 0
+        },
+        "retrieval": {
+          "source_reachable": true,
+          "evidence_retrieved": true,
+          "image_valid": true,
+          "error": null
+        },
+        "explanation": "Unverified: Candidate image does not meet derivative or biometric confidence gates."
+      },
+      "task3_compliance": {
+        "state": "INCONCLUSIVE",
+        "passed": false,
+        "failed_gates": [
+          "ARCFACE_VERIFIED (Face similarity 0.5274 does not meet verification threshold)"
+        ],
+        "reason": "Candidate evidence verification unavailable: Unverified: Candidate image does not meet derivative or biometric confidence gates."
+      }
+    },
+    {
+      "candidate_id": "cand_1b7b1fff12f6",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "FULL",
+      "page_url": "https://www.youtube.com/watch?v=yE6IfCrqg3s",
+      "image_url": "https://i.ytimg.com/vi/yE6IfCrqg3s/hqdefault.jpg",
+      "page_title": "Computer Science Education Week 2013 - YouTube",
+      "provider_score": 0.8,
+      "platform": "youtube",
+      "is_external_source": true,
+      "is_social_domain": true,
+      "is_post_url": true,
+      "retrieval_score": 1.38,
+      "retrieval": {
+        "source_reachable": true,
+        "evidence_retrieved": true,
+        "image_valid": true,
+        "error": null
+      },
+      "verification": {
+        "classification": "PROBABLE_MATCH",
+        "verification_state": "PROBABLE_MATCH",
+        "sha256_exact": false,
+        "sha256_candidate": "39cddee17f0654e8df20f74bab60eb49221d8f934d5fd74954181a9c92e4ad19",
+        "phash_distance": 34,
+        "phash": {
+          "available": true,
+          "distance": 34
+        },
+        "face_verified": false,
+        "face_similarity": 0.6201,
+        "faces_detected": 1,
+        "best_face_index": 0,
+        "face": {
+          "detected": true,
+          "verified": false,
+          "model": "ArcFace",
+          "similarity": 0.6201,
+          "faces_detected": 1,
+          "selected_face_index": 0
+        },
+        "retrieval": {
+          "source_reachable": true,
+          "evidence_retrieved": true,
+          "image_valid": true,
+          "error": null
+        },
+        "explanation": "Probable match: Candidate face similarity (0.6201) shows moderate correlation."
+      },
+      "task3_compliance": {
+        "state": "REJECTED",
+        "passed": false,
+        "failed_gates": [
+          "ARCFACE_VERIFIED (Face similarity 0.6201 does not meet verification threshold)"
+        ],
+        "reason": "Candidate failed Task 3 mandatory compliance gates: ARCFACE_VERIFIED (Face similarity 0.6201 does not meet verification threshold)"
+      }
+    },
+    {
+      "candidate_id": "cand_4681db9c0164",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "FULL",
+      "page_url": "https://www.youtube.com/watch?v=8sthaV8ddJ4",
+      "image_url": "https://i.ytimg.com/vi/8sthaV8ddJ4/maxresdefault.jpg",
+      "page_title": "Weekly Address: Giving Every Student an Opportunity to ... - YouTube",
+      "provider_score": 0.8,
+      "platform": "youtube",
+      "is_external_source": true,
+      "is_social_domain": true,
+      "is_post_url": true,
+      "retrieval_score": 1.38,
+      "retrieval": {
+        "source_reachable": true,
+        "evidence_retrieved": true,
+        "image_valid": true,
+        "error": null
+      },
+      "verification": {
+        "classification": "PROBABLE_MATCH",
+        "verification_state": "PROBABLE_MATCH",
+        "sha256_exact": false,
+        "sha256_candidate": "f86cbd3cfa2adde7fe0401ee2e94153eb03b5cef6b878770885789a8c030a94c",
+        "phash_distance": 38,
+        "phash": {
+          "available": true,
+          "distance": 38
+        },
+        "face_verified": false,
+        "face_similarity": 0.6406,
+        "faces_detected": 1,
+        "best_face_index": 0,
+        "face": {
+          "detected": true,
+          "verified": false,
+          "model": "ArcFace",
+          "similarity": 0.6406,
+          "faces_detected": 1,
+          "selected_face_index": 0
+        },
+        "retrieval": {
+          "source_reachable": true,
+          "evidence_retrieved": true,
+          "image_valid": true,
+          "error": null
+        },
+        "explanation": "Probable match: Candidate face similarity (0.6406) shows moderate correlation."
+      },
+      "task3_compliance": {
+        "state": "REJECTED",
+        "passed": false,
+        "failed_gates": [
+          "ARCFACE_VERIFIED (Face similarity 0.6406 does not meet verification threshold)"
+        ],
+        "reason": "Candidate failed Task 3 mandatory compliance gates: ARCFACE_VERIFIED (Face similarity 0.6406 does not meet verification threshold)"
+      }
+    },
+    {
+      "candidate_id": "cand_23e562d835f9",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "FULL",
+      "page_url": "https://www.reddit.com/r/ProgrammerHumor/comments/1xnnmt/obama_answering_a_computer_science_question",
+      "image_url": null,
+      "page_title": "Obama answering a computer science question : r/ProgrammerHumor",
+      "provider_score": 0.8,
+      "platform": "reddit",
+      "is_external_source": true,
+      "is_social_domain": true,
+      "is_post_url": true,
+      "retrieval_score": 1.38,
+      "retrieval": {
+        "source_reachable": true,
+        "evidence_retrieved": false,
+        "image_valid": false,
+        "error": "No direct image URL or OpenGraph image found for candidate."
+      },
+      "verification": {
+        "classification": "UNVERIFIED",
+        "verification_state": "UNVERIFIED",
+        "sha256_exact": false,
+        "sha256_candidate": null,
+        "phash_distance": null,
+        "phash": {
+          "available": false,
+          "distance": null
+        },
+        "face_verified": false,
+        "face_similarity": null,
+        "faces_detected": 0,
+        "best_face_index": null,
+        "face": {
+          "detected": false,
+          "verified": false,
+          "model": "ArcFace",
+          "similarity": null,
+          "faces_detected": 0,
+          "selected_face_index": null
+        },
+        "retrieval": {
+          "source_reachable": true,
+          "evidence_retrieved": false,
+          "image_valid": false,
+          "error": "No direct image URL or OpenGraph image found for candidate."
+        },
+        "explanation": "Candidate image unreachable: No direct image URL or OpenGraph image found for candidate."
+      },
+      "task3_compliance": {
+        "state": "INCONCLUSIVE",
+        "passed": false,
+        "failed_gates": [
+          "EVIDENCE_RETRIEVABLE (No direct image URL or OpenGraph image found for candidate.)",
+          "VALID_CANDIDATE_IMAGE (No direct image URL or OpenGraph image found for candidate.)",
+          "FACE_DETECTED (No face detected in candidate image)",
+          "ARCFACE_VERIFIED (Face similarity None does not meet verification threshold)"
+        ],
+        "reason": "Candidate evidence verification unavailable: Candidate image unreachable: No direct image URL or OpenGraph image found for candidate."
+      }
+    },
+    {
+      "candidate_id": "cand_d70c4b97bb00",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "FULL",
+      "page_url": "https://www.reddit.com/r/programming/comments/bch0m/obama_answers_eric_schmidts_interview_questions",
+      "image_url": null,
+      "page_title": "Obama answers Eric Schmidt's interview questions : r/programming",
+      "provider_score": 0.8,
+      "platform": "reddit",
+      "is_external_source": true,
+      "is_social_domain": true,
+      "is_post_url": true,
+      "retrieval_score": 1.38,
+      "retrieval": {
+        "source_reachable": true,
+        "evidence_retrieved": false,
+        "image_valid": false,
+        "error": "No direct image URL or OpenGraph image found for candidate."
+      },
+      "verification": {
+        "classification": "UNVERIFIED",
+        "verification_state": "UNVERIFIED",
+        "sha256_exact": false,
+        "sha256_candidate": null,
+        "phash_distance": null,
+        "phash": {
+          "available": false,
+          "distance": null
+        },
+        "face_verified": false,
+        "face_similarity": null,
+        "faces_detected": 0,
+        "best_face_index": null,
+        "face": {
+          "detected": false,
+          "verified": false,
+          "model": "ArcFace",
+          "similarity": null,
+          "faces_detected": 0,
+          "selected_face_index": null
+        },
+        "retrieval": {
+          "source_reachable": true,
+          "evidence_retrieved": false,
+          "image_valid": false,
+          "error": "No direct image URL or OpenGraph image found for candidate."
+        },
+        "explanation": "Candidate image unreachable: No direct image URL or OpenGraph image found for candidate."
+      },
+      "task3_compliance": {
+        "state": "INCONCLUSIVE",
+        "passed": false,
+        "failed_gates": [
+          "EVIDENCE_RETRIEVABLE (No direct image URL or OpenGraph image found for candidate.)",
+          "VALID_CANDIDATE_IMAGE (No direct image URL or OpenGraph image found for candidate.)",
+          "FACE_DETECTED (No face detected in candidate image)",
+          "ARCFACE_VERIFIED (Face similarity None does not meet verification threshold)"
+        ],
+        "reason": "Candidate evidence verification unavailable: Candidate image unreachable: No direct image URL or OpenGraph image found for candidate."
+      }
+    },
+    {
+      "candidate_id": "cand_96fe68f7dab3",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "PARTIAL",
+      "page_url": "",
+      "image_url": "https://lookaside.instagram.com/seo/google_widget/crawler?media_id=3955034224498971283",
+      "page_title": null,
+      "provider_score": 0.75,
+      "platform": "instagram",
+      "is_external_source": true,
+      "is_social_domain": true,
+      "is_post_url": false,
+      "retrieval_score": 0.925,
+      "retrieval": {
+        "source_reachable": false,
+        "evidence_retrieved": false,
+        "image_valid": false,
+        "error": "HTTP 400 fetching image from https://lookaside.instagram.com/seo/google_widget/crawler?media_id=3955034224498971283"
+      },
+      "verification": {
+        "classification": "UNVERIFIED",
+        "verification_state": "UNVERIFIED",
+        "sha256_exact": false,
+        "sha256_candidate": null,
+        "phash_distance": null,
+        "phash": {
+          "available": false,
+          "distance": null
+        },
+        "face_verified": false,
+        "face_similarity": null,
+        "faces_detected": 0,
+        "best_face_index": null,
+        "face": {
+          "detected": false,
+          "verified": false,
+          "model": "ArcFace",
+          "similarity": null,
+          "faces_detected": 0,
+          "selected_face_index": null
+        },
+        "retrieval": {
+          "source_reachable": false,
+          "evidence_retrieved": false,
+          "image_valid": false,
+          "error": "HTTP 400 fetching image from https://lookaside.instagram.com/seo/google_widget/crawler?media_id=3955034224498971283"
+        },
+        "explanation": "Candidate image unreachable: HTTP 400 fetching image from https://lookaside.instagram.com/seo/google_widget/crawler?media_id=3955034224498971283"
+      },
+      "task3_compliance": {
+        "state": "REJECTED",
+        "passed": false,
+        "failed_gates": [
+          "EXTERNAL_SOURCE (Disallowed or internal domain: none)",
+          "POST_LIKE_URL (URL path '' is not a post/content URL)",
+          "SOURCE_REACHABLE (HTTP 400 fetching image from https://lookaside.instagram.com/seo/google_widget/crawler?media_id=3955034224498971283)",
+          "EVIDENCE_RETRIEVABLE (HTTP 400 fetching image from https://lookaside.instagram.com/seo/google_widget/crawler?media_id=3955034224498971283)",
+          "VALID_CANDIDATE_IMAGE (HTTP 400 fetching image from https://lookaside.instagram.com/seo/google_widget/crawler?media_id=3955034224498971283)",
+          "FACE_DETECTED (No face detected in candidate image)",
+          "ARCFACE_VERIFIED (Face similarity None does not meet verification threshold)"
+        ],
+        "reason": "Candidate is from an internal placeholder or search-provider domain and was rejected as a valid external evidence source."
+      }
+    },
+    {
+      "candidate_id": "cand_f37170c4b980",
+      "provider": "google_vision",
+      "query_variants": [
+        "original",
+        "face_crop"
+      ],
+      "provider_match_type": "PARTIAL",
+      "page_url": "",
+      "image_url": "https://preview.redd.it/that-one-time-barack-obama-did-an-ama-on-reddit-in-2012-v0-ldmc0pc4uwkh1.jpeg?auto=webp",
+      "page_title": null,
+      "provider_score": 0.75,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.975,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_e3bfee94f9ec",
+      "provider": "google_vision",
+      "query_variants": [
+        "original",
+        "face_crop"
+      ],
+      "provider_match_type": "PARTIAL",
+      "page_url": "",
+      "image_url": "https://media.wired.com/photos/5932b3245c4fbd732b5543ea/3:2/w_2560%2Cc_limit/obama-reddit-f.jpg",
+      "page_title": null,
+      "provider_score": 0.75,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.975,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_01ebb5f20f64",
+      "provider": "google_vision",
+      "query_variants": [
+        "original",
+        "face_crop"
+      ],
+      "provider_match_type": "PARTIAL",
+      "page_url": "",
+      "image_url": "https://www.motherjones.com/wp-content/uploads/obama2_1.jpg?w=990",
+      "page_title": null,
+      "provider_score": 0.75,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.975,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_0079f50ff2ce",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "FULL",
+      "page_url": "",
+      "image_url": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit-1500w,f_auto,q_auto:best/streams/2012/August/120829/508307-120829-tech-obama.jpg",
+      "page_title": null,
+      "provider_score": 0.9,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.94,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_cd33b8f4b7f3",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "FULL",
+      "page_url": "",
+      "image_url": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit-1500w,f_auto,q_auto:best/streams/2012/August/120830/510144-rose-gordon-salaE2B41E90-ADE7-A36D-3602-965FAA314EF2.jpg",
+      "page_title": null,
+      "provider_score": 0.9,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.94,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_22ed7fb2006d",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "FULL",
+      "page_url": "",
+      "image_url": "https://media-cldnry.s-nbcnews.com/image/upload/t_fit-1500w,f_auto,q_auto:best/streams/2012/August/120830/510193-traci-lee7B836A43-F233-B91B-C7FD-1399ADA33B81.jpg",
+      "page_title": null,
+      "provider_score": 0.9,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.94,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_b98a5e2c137e",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "FULL",
+      "page_url": "",
+      "image_url": "https://static.time.com/v3/assets/bltea6093859af6183b/blteff0fec08ce7c3ad/698684f1169ab007392782e6/barack.jpg?branch=production&width=1440&quality=75&auto=webp",
+      "page_title": null,
+      "provider_score": 0.9,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.94,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_7c6ad5587bfe",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "FULL",
+      "page_url": "",
+      "image_url": "https://media-cldnry.s-nbcnews.com/image/upload/t_social_share_1024x768_scale,f_auto,q_auto:best/streams/2012/August/120830/510193-traci-lee7B836A43-F233-B91B-C7FD-1399ADA33B81.jpg",
+      "page_title": null,
+      "provider_score": 0.9,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.94,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_9542eee842a7",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "FULL",
+      "page_url": "",
+      "image_url": "https://media-cldnry.s-nbcnews.com/image/upload/t_social_share_1024x768_scale,f_auto,q_auto:best/streams/2012/August/120829/508307-120829-tech-obama.jpg",
+      "page_title": null,
+      "provider_score": 0.9,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.94,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_bd3d199b6b7a",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "FULL",
+      "page_url": "",
+      "image_url": "https://media-cldnry.s-nbcnews.com/image/upload/t_social_share_1024x768_scale,f_auto,q_auto:best/streams/2012/August/120830/510144-rose-gordon-salaE2B41E90-ADE7-A36D-3602-965FAA314EF2.jpg",
+      "page_title": null,
+      "provider_score": 0.9,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.94,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_17b152ccf536",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "FULL",
+      "page_url": "",
+      "image_url": "https://www.siliconrepublic.com/wp-content/uploads/2014/12/201208/obama-on-reddit-ama.jpg",
+      "page_title": null,
+      "provider_score": 0.9,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.94,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_066dc8d3f6e4",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "FULL",
+      "page_url": "",
+      "image_url": "https://www.siliconrepublic.com/wp-content/uploads/2014/12/201208/obama-on-reddit-ama-718x523.jpg",
+      "page_title": null,
+      "provider_score": 0.9,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.94,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_a3f191a5a464",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "FULL",
+      "page_url": "",
+      "image_url": "https://media.wired.com/photos/5b3332ff9429444844cd0296/master/w_1024%2Cc_limit/Obama-AMA.jpg",
+      "page_title": null,
+      "provider_score": 0.9,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.94,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_f421c0c50d0c",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "FULL",
+      "page_url": "https://www.cio.com/article/240829/obama-announces-computer-science-for-all-initiative.html",
+      "image_url": null,
+      "page_title": "Obama announces computer-science-for-all initiative - CIO",
+      "provider_score": 0.8,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.93,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_e338e7000736",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "FULL",
+      "page_url": "https://www.normantranscript.com/obama-calling-for-better-security-for-computers/article_be9592ec-26d0-5ec4-91ca-25cb04bc94e9.html",
+      "image_url": null,
+      "page_title": "Obama calling for better security for computers - Norman Transcript",
+      "provider_score": 0.8,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.93,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_e6e44e50be96",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "FULL",
+      "page_url": "https://www.washingtonexaminer.com/opinion/beltway-confidential/1766228/obama-im-the-president-of-the-united-states-of-course-i-have-a-computer",
+      "image_url": null,
+      "page_title": "Obama: I'm the president of the United States, of course I have a ...",
+      "provider_score": 0.8,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.93,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_fcb3ad32db09",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "PARTIAL",
+      "page_url": "",
+      "image_url": "https://preview.redd.it/that-one-time-barack-obama-did-an-ama-on-reddit-in-2012-v0-ldmc0pc4uwkh1.jpeg?width=1080&crop=smart&auto=webp",
+      "page_title": null,
+      "provider_score": 0.75,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.725,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_a57307c6a7c0",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "PARTIAL",
+      "page_url": "",
+      "image_url": "https://i.redd.it/ldmc0pc4uwkh1.jpeg",
+      "page_title": null,
+      "provider_score": 0.75,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.725,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_e4e1ec60e077",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "PARTIAL",
+      "page_url": "",
+      "image_url": "https://preview.redd.it/that-one-time-barack-obama-did-an-ama-on-reddit-in-2012-v0-ldmc0pc4uwkh1.jpeg?width=640&crop=smart&auto=webp",
+      "page_title": null,
+      "provider_score": 0.75,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.725,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_33fb8e9dca3b",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "PARTIAL",
+      "page_url": "",
+      "image_url": "https://preview.redd.it/pok0r9a4kskh1.png?width=140&height=105&auto=webp",
+      "page_title": null,
+      "provider_score": 0.75,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.725,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_dcb4ceea56f2",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "PARTIAL",
+      "page_url": "",
+      "image_url": "https://i.pinimg.com/236x/8c/bf/1e/8cbf1e27180ba14dcdb4fc1052fac2ed.jpg",
+      "page_title": null,
+      "provider_score": 0.75,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.725,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_6f4a0e5828fd",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "PARTIAL",
+      "page_url": "",
+      "image_url": "https://i.ytimg.com/vi/gGj8pk2P0hI/sddefault.jpg",
+      "page_title": null,
+      "provider_score": 0.75,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.725,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_3d52d3389c7d",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "SIMILAR",
+      "page_url": "",
+      "image_url": "https://preview.redd.it/this-is-a-real-picture-of-barack-obama-using-reddit-v0-pok0r9a4kskh1.png?auto=webp",
+      "page_title": null,
+      "provider_score": 0.5,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.4,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_fd3d76728dd5",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "SIMILAR",
+      "page_url": "",
+      "image_url": "https://i.ytimg.com/vi/m62JwVFL_Og/maxresdefault.jpg",
+      "page_title": null,
+      "provider_score": 0.5,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.4,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_3e030cdb3714",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "SIMILAR",
+      "page_url": "",
+      "image_url": "https://lookaside.fbsbx.com/lookaside/crawler/media?media_id=493848776754415&get_thumbnail=1",
+      "page_title": null,
+      "provider_score": 0.5,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.4,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_c266e7e9eea8",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "SIMILAR",
+      "page_url": "",
+      "image_url": "https://comunica.ufu.br/sites/default/files/styles/full_hd_3_colunas/public/imagem-chamada/2026-09/WhatsApp%20Image%202026-09-04%20at%2011.20.34.jpeg.webp?itok=jBg1kP-h",
+      "page_title": null,
+      "provider_score": 0.5,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.4,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_768c4850bdc2",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "SIMILAR",
+      "page_url": "",
+      "image_url": "x-raw-image:///cc635d89f34c4d68e004c7b6c1ea1b652384135a34e61dec3c24ba6105db75d5",
+      "page_title": null,
+      "provider_score": 0.5,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.4,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_a0c5b28332c6",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "SIMILAR",
+      "page_url": "",
+      "image_url": "https://imagenes.elpais.com/resizer/v2/RWTZH2UCSRCNRLV6SG4YURBSMQ.jfif?auth=f4ac071dd2eb49176c66d8cac315bb0a2a124bd7f11c669f1b1a1a7975f8d18a&width=414&height=311&smart=true",
+      "page_title": null,
+      "provider_score": 0.5,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.4,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_feb23c7ec09a",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "SIMILAR",
+      "page_url": "",
+      "image_url": "https://cdn.iuhealth.org/news-hub/_1200x630_crop_center-center_82_none/Screenshot-2026-07-20-at-6.50.55-PM.png?mtime=1784587936",
+      "page_title": null,
+      "provider_score": 0.5,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.4,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_d645c1d3f26b",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "SIMILAR",
+      "page_url": "",
+      "image_url": "https://midias.correiobraziliense.com.br/_midias/jpg/2025/12/12/photo-2025-12-12-17-40-41-62071602.jpg",
+      "page_title": null,
+      "provider_score": 0.5,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.4,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_5cfa5b5842df",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "SIMILAR",
+      "page_url": "",
+      "image_url": "https://i.ytimg.com/vi/nMShJX0H34w/maxresdefault.jpg",
+      "page_title": null,
+      "provider_score": 0.5,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.4,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_d3fff244986c",
+      "provider": "google_vision",
+      "query_variants": [
+        "original"
+      ],
+      "provider_match_type": "SIMILAR",
+      "page_url": "",
+      "image_url": "https://i.ytimg.com/vi/mOkk0QDMuGk/maxresdefault.jpg",
+      "page_title": null,
+      "provider_score": 0.5,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.4,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_ffc058f9a005",
+      "provider": "google_vision",
+      "query_variants": [
+        "face_crop"
+      ],
+      "provider_match_type": "SIMILAR",
+      "page_url": "",
+      "image_url": "https://media.licdn.com/dms/image/v2/C5603AQGwwWEkskrDNA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1516976799062?e=2147483647&v=beta",
+      "page_title": null,
+      "provider_score": 0.5,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.4,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_1f4cb890516c",
+      "provider": "google_vision",
+      "query_variants": [
+        "face_crop"
+      ],
+      "provider_match_type": "SIMILAR",
+      "page_url": "",
+      "image_url": "https://www.tribuneindia.com/sortd-service/imaginary/v22-01/jpg/medium/high?url=dGhldHJpYnVuZS1zb3J0ZC1wcm8tcHJvZC1zb3J0ZC9tZWRpYWZmOThkZWUwLWE4OTgtMTFmMS05YjIwLTgzZThkYzhhYjE2YS5qcGc%3D",
+      "page_title": null,
+      "provider_score": 0.5,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.4,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_cc1901862533",
+      "provider": "google_vision",
+      "query_variants": [
+        "face_crop"
+      ],
+      "provider_match_type": "SIMILAR",
+      "page_url": "",
+      "image_url": "https://nsrcel.org/wp-content/uploads/2026/06/K-Ganesh.webp",
+      "page_title": null,
+      "provider_score": 0.5,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.4,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_0df6d41a1c90",
+      "provider": "google_vision",
+      "query_variants": [
+        "face_crop"
+      ],
+      "provider_match_type": "SIMILAR",
+      "page_url": "",
+      "image_url": "https://www.syracuse.edu/images/m8SE-szdP1sfWg9KK1tMXaxDKm8=/4356/width-1100/Ryan-Williams_photo_300px.jpg",
+      "page_title": null,
+      "provider_score": 0.5,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.4,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_eade136b34d7",
+      "provider": "google_vision",
+      "query_variants": [
+        "face_crop"
+      ],
+      "provider_match_type": "SIMILAR",
+      "page_url": "",
+      "image_url": "https://mped.gov.eg/AdminPanel/sharedImages/c8ff471a-471f-4cd2-b749-ddaa5330e36b_MPED-Egypt-othman-mohamad-othman.jpg",
+      "page_title": null,
+      "provider_score": 0.5,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.4,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_49b773e104ca",
+      "provider": "google_vision",
+      "query_variants": [
+        "face_crop"
+      ],
+      "provider_match_type": "SIMILAR",
+      "page_url": "",
+      "image_url": "https://cmf.iitd.ac.in/people/hemant.jpg",
+      "page_title": null,
+      "provider_score": 0.5,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.4,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_31a2cc5cddd6",
+      "provider": "google_vision",
+      "query_variants": [
+        "face_crop"
+      ],
+      "provider_match_type": "SIMILAR",
+      "page_url": "",
+      "image_url": "https://rnd.iitb.ac.in/sites/default/files/inline-images/Narayanamurthy_1.jpeg",
+      "page_title": null,
+      "provider_score": 0.5,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.4,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_e456593d3553",
+      "provider": "google_vision",
+      "query_variants": [
+        "face_crop"
+      ],
+      "provider_match_type": "SIMILAR",
+      "page_url": "",
+      "image_url": "https://byst.org.in/wp-content/uploads/2024/02/Mukundan.png",
+      "page_title": null,
+      "provider_score": 0.5,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.4,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_65a6ce1e5922",
+      "provider": "google_vision",
+      "query_variants": [
+        "face_crop"
+      ],
+      "provider_match_type": "SIMILAR",
+      "page_url": "",
+      "image_url": "https://www.spu.ac.za/wp-content/uploads/elementor/thumbs/Photograph-2-Prof-R-J-Carolissen-1-150x150-1-qw9kvi0c09gs2nubq5txsdlvzi48y5u7lkc49up03c.jpg",
+      "page_title": null,
+      "provider_score": 0.5,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.4,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    },
+    {
+      "candidate_id": "cand_4300df849737",
+      "provider": "google_vision",
+      "query_variants": [
+        "face_crop"
+      ],
+      "provider_match_type": "SIMILAR",
+      "page_url": "",
+      "image_url": "https://giwmscdnone.gov.np/media/albums/1000070964_bzpc2oJ1CZ_e3u3bzc.jpg",
+      "page_title": null,
+      "provider_score": 0.5,
+      "platform": null,
+      "is_external_source": true,
+      "is_social_domain": false,
+      "is_post_url": false,
+      "retrieval_score": 0.4,
+      "retrieval": null,
+      "verification": null,
+      "task3_compliance": null
+    }
+  ],
+  "metrics": {
+    "raw_candidate_count": 55,
+    "deduplicated_count": 52,
+    "social_candidate_count": 10,
+    "post_url_count": 9,
+    "verified_candidate_count": 1,
+    "qualifying_social_post_count": 1,
+    "web_matches_only_count": 0,
+    "total_latency_ms": 9073.6
+  },
+  "blockchain": {
+    "network": "base_sepolia",
+    "chain_id": 84532,
+    "contract_address": "0x71fcDeb36659E264716618b3E3a7C142Ff42455a",
+    "evidence_hash": "0x1f2e49a7c034d578add5b8bb4e307fdc0b50c7ba67dad5dc0e04a1b45c244f4d",
+    "transaction_hash": "0x48e3b99c03504f08005eaf60a25073e76ad75401e310c50f27fbd208275077d7",
+    "block_number": 46459229,
+    "timestamp": 1788686746,
+    "submitter": "0xe70d301abB4E12e36FC1FD42c71E8Ebbfe0AB672",
+    "anchor_status": "ALREADY_ANCHORED",
+    "verification_status": "MATCH",
+    "blockchain_status": "LIVE_CONFIRMED",
+    "execution_mode": "LIVE_BLOCKCHAIN",
+    "error": null
+  }
+}
