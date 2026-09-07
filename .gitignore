@@ -53,6 +53,7 @@ models/
 data/temp/
 data/cache/
 data/runs/*
+data/uploads/
 *.log
 
 # ==============================
@@ -84,3 +85,4 @@ Thumbs.db
 screenshots/
 # Personal biometric samples
 samples/udit.jpg
+samples/my_face.jpg

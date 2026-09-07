@@ -39,6 +39,7 @@ class PipelineStage(str, Enum):
     BLOCKCHAIN_ERROR = "BLOCKCHAIN_ERROR"
     BLOCKCHAIN_VERIFICATION_FAILED = "BLOCKCHAIN_VERIFICATION_FAILED"
     TAMPER_DETECTED = "TAMPER_DETECTED"
+    CANCELLED = "CANCELLED"
 
 
 class ExecutionMode(str, Enum):
@@ -52,6 +53,7 @@ class PipelineStatus(str, Enum):
     FAILED = "FAILED"
     BLOCKED = "BLOCKED"
     DEMO_NOT_FINAL = "DEMO_NOT_FINAL"
+    CANCELLED = "CANCELLED"
 
 
 @dataclass
@@ -165,8 +167,10 @@ class FaceTraceRunResult:
     tamper_test: Optional[TamperTestSummary] = None
     timings_ms: TimingsSummary = field(default_factory=TimingsSummary)
     evidence: Optional[Dict[str, Any]] = None
+    investigation_summary: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
     error_action: Optional[str] = None
+    error_title: Optional[str] = None
     history: List[str] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -184,7 +188,10 @@ class FaceTraceRunResult:
             "blockchain": self.blockchain.to_dict() if self.blockchain else None,
             "tamper_test": self.tamper_test.to_dict() if self.tamper_test else None,
             "timings_ms": self.timings_ms.to_dict(),
+            "investigation_summary": self.investigation_summary,
             "error": self.error,
+            "error_action": self.error_action,
+            "error_title": self.error_title,
             "history": self.history
         }
         if self.evidence:

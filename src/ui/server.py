@@ -4,8 +4,10 @@ Provides a lightweight, deterministic server for the judge-facing interface.
 Zero external server dependencies (pure Python standard library).
 """
 
+import base64
 from http import HTTPStatus
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
+import io
 import json
 import logging
 import mimetypes
@@ -17,6 +19,8 @@ from typing import Dict, Any, Optional
 import urllib.parse
 import uuid
 import re
+
+from PIL import Image
 
 from dotenv import load_dotenv
 
@@ -65,6 +69,41 @@ STAGE_ORDER = [
     "INTEGRITY_CHECK"
 ]
 
+PIPELINE_STAGE_TO_UI_STAGE = {
+    "INIT": "FACE_DETECTION",
+    "INPUT_VALIDATED": "FACE_DETECTION",
+    "CONSENT_CONFIRMED": "FACE_DETECTION",
+    "INPUT_ERROR": "FACE_DETECTION",
+    "NO_FACE": "FACE_DETECTION",
+    "FACE_DETECTED": "FACE_DETECTION",
+    "FACE_EMBEDDED": "FACE_DETECTION",
+    "SEARCH_RUNNING": "WEB_DISCOVERY",
+    "SEARCH_COMPLETE": "WEB_DISCOVERY",
+    "SEARCH_ERROR": "WEB_DISCOVERY",
+    "CANDIDATE_SELECTED": "SOCIAL_POST",
+    "SOCIAL_REQUIREMENT_FAILED": "SOCIAL_POST",
+    "SOCIAL_COMPLIANCE_PASSED": "SOCIAL_POST",
+    "FACE_VERIFICATION_FAILED": "INDEPENDENT_VERIFICATION",
+    "FACE_VERIFICATION_PASSED": "INDEPENDENT_VERIFICATION",
+    "EVIDENCE_VALIDATED": "EVIDENCE_COMMITMENT",
+    "EVIDENCE_HASHED": "EVIDENCE_COMMITMENT",
+    "EVIDENCE_INVALID": "EVIDENCE_COMMITMENT",
+    "BLOCKCHAIN_ANCHORING": "BLOCKCHAIN",
+    "BLOCKCHAIN_CONFIRMED": "BLOCKCHAIN",
+    "BLOCKCHAIN_ERROR": "BLOCKCHAIN",
+    "BLOCKCHAIN_VERIFICATION_FAILED": "BLOCKCHAIN",
+    "ONCHAIN_VERIFIED": "BLOCKCHAIN",
+    "TAMPER_TEST_COMPLETE": "INTEGRITY_CHECK",
+    "TAMPER_DETECTED": "INTEGRITY_CHECK",
+    "COMPLETE": "INTEGRITY_CHECK"
+}
+
+BUSINESS_NO_RESULT_STAGES = {
+    "NO_MATCH",
+    "SOCIAL_REQUIREMENT_FAILED",
+    "FACE_VERIFICATION_FAILED"
+}
+
 
 class RunStateTracker:
     """Thread-safe state tracker for active and completed runs."""
@@ -73,6 +112,7 @@ class RunStateTracker:
         self._lock = threading.Lock()
         self._runs: Dict[str, Dict[str, Any]] = {}
         self._latest_run_id: Optional[str] = None
+        self._cancellations: set[str] = set()
 
     def create_run(self, run_id: str, image_path: Path, mode: ExecutionMode) -> Dict[str, Any]:
         with self._lock:
@@ -87,6 +127,7 @@ class RunStateTracker:
                 "stages": {s: "PENDING" for s in STAGE_ORDER},
                 "history": ["INIT"],
                 "result": None,
+                "investigation_summary": None,
                 "error": None,
                 "error_action": None
             }
@@ -124,8 +165,19 @@ class RunStateTracker:
             for s in STAGE_ORDER:
                 state["stages"][s] = "PASSED"
             state["result"] = self._sanitize(result_dict)
+            if result_dict.get("investigation_summary"):
+                state["investigation_summary"] = self._sanitize(result_dict["investigation_summary"])
 
-    def fail_run(self, run_id: str, error: str, action: str, failed_stage: str = ""):
+    def fail_run(
+        self,
+        run_id: str,
+        error: str,
+        action: str,
+        failed_stage: str = "",
+        title: str = "",
+        investigation_summary: Optional[Dict[str, Any]] = None,
+        result_dict: Optional[Dict[str, Any]] = None
+    ):
         with self._lock:
             if run_id not in self._runs:
                 return
@@ -133,10 +185,117 @@ class RunStateTracker:
             state["status"] = "FAILED"
             state["error"] = error
             state["error_action"] = action
-            state["status_message"] = f"Failed: {error}"
+            state["error_title"] = title or failed_stage or state.get("current_stage") or "PIPELINE_FAILURE"
+            state["status_message"] = title or f"Failed: {error}"
+            if investigation_summary:
+                state["investigation_summary"] = self._sanitize(investigation_summary)
+            if result_dict:
+                state["result"] = self._sanitize(result_dict)
+                if not state.get("investigation_summary") and result_dict.get("investigation_summary"):
+                    state["investigation_summary"] = self._sanitize(result_dict["investigation_summary"])
 
-            cur = state["current_stage"]
-            state["stages"][cur] = "FAILED"
+            inv = state.get("investigation_summary") or {}
+            has_verified_web_match = (
+                inv.get("verified_web_matches", 0) > 0
+                or (result_dict and result_dict.get("verification", {}).get("state") in ("VERIFIED_DERIVATIVE", "VERIFIED_EXACT"))
+                or "FACE_VERIFICATION_PASSED" in state.get("history", [])
+            )
+
+            # Special forensic handling: if verified web matches exist (e.g. SRK case)
+            if has_verified_web_match:
+                state["stages"]["FACE_DETECTION"] = "PASSED"
+                state["stages"]["WEB_DISCOVERY"] = "PASSED"
+                state["stages"]["SOCIAL_POST"] = "COMPLETED_NO_RESULT"
+                state["stages"]["INDEPENDENT_VERIFICATION"] = "PASSED"
+                state["stages"]["EVIDENCE_COMMITMENT"] = "SKIPPED"
+                state["stages"]["BLOCKCHAIN"] = "SKIPPED"
+                state["stages"]["INTEGRITY_CHECK"] = "SKIPPED"
+                state["current_stage"] = "INDEPENDENT_VERIFICATION"
+                return
+
+            # Special case: 0 candidates discovered from provider
+            if title == "NO PUBLIC WEB MATCH FOUND" or (inv and inv.get("total_discovered", 0) == 0 and "no indexed matches" in (error or "").lower()):
+                state["stages"]["FACE_DETECTION"] = "PASSED"
+                state["stages"]["WEB_DISCOVERY"] = "COMPLETED_NO_RESULT"
+                state["stages"]["SOCIAL_POST"] = "SKIPPED"
+                state["stages"]["INDEPENDENT_VERIFICATION"] = "SKIPPED"
+                state["stages"]["EVIDENCE_COMMITMENT"] = "SKIPPED"
+                state["stages"]["BLOCKCHAIN"] = "SKIPPED"
+                state["stages"]["INTEGRITY_CHECK"] = "SKIPPED"
+                state["current_stage"] = "WEB_DISCOVERY"
+                return
+
+            # Resolve active UI presentation stage
+            target_ui_stage: str = "FACE_DETECTION"
+            if failed_stage in STAGE_ORDER:
+                target_ui_stage = failed_stage
+            elif failed_stage == "NO_MATCH":
+                if title == "NO PUBLIC WEB MATCH FOUND" or "no indexed matches" in (error or "").lower():
+                    target_ui_stage = "WEB_DISCOVERY"
+                else:
+                    target_ui_stage = "SOCIAL_POST"
+            elif failed_stage in PIPELINE_STAGE_TO_UI_STAGE:
+                target_ui_stage = PIPELINE_STAGE_TO_UI_STAGE[failed_stage]
+            elif state.get("current_stage") in STAGE_ORDER:
+                target_ui_stage = state["current_stage"]
+
+            # Classify business no-result vs technical/system failure
+            is_no_result = (
+                failed_stage in BUSINESS_NO_RESULT_STAGES
+                or title in ("NO QUALIFYING PUBLIC MATCH", "NO PUBLIC WEB MATCH FOUND")
+                or "no candidate matched" in (error or "").lower()
+                or "no indexed matches" in (error or "").lower()
+                or "no qualifying social post" in (error or "").lower()
+            )
+            terminal_status = "COMPLETED_NO_RESULT" if is_no_result else "ERROR"
+
+            if target_ui_stage in STAGE_ORDER:
+                idx = STAGE_ORDER.index(target_ui_stage)
+                # Prior stages are preserved as PASSED
+                for prior in STAGE_ORDER[:idx]:
+                    state["stages"][prior] = "PASSED"
+                # Active terminal stage
+                state["stages"][target_ui_stage] = terminal_status
+                state["current_stage"] = target_ui_stage
+                # Downstream stages are marked SKIPPED rather than remaining PENDING
+                for downstream in STAGE_ORDER[idx + 1:]:
+                    state["stages"][downstream] = "SKIPPED"
+
+    def request_cancellation(self, run_id: str) -> bool:
+        """Requests cooperative cancellation for an active run."""
+        with self._lock:
+            if run_id not in self._runs:
+                return False
+            state = self._runs[run_id]
+            if state["status"] in ("COMPLETE", "FAILED", "CANCELLED"):
+                return False
+            self._cancellations.add(run_id)
+            state["status_message"] = "Stopping verification..."
+            return True
+
+    def is_cancelled(self, run_id: str) -> bool:
+        """Checks whether cancellation has been requested for a run."""
+        with self._lock:
+            return run_id in self._cancellations
+
+    def mark_cancelled(self, run_id: str, error: str = "Verification stopped by user.", action: str = "Click NEW VERIFICATION to start a new verification."):
+        """Marks a run as cleanly cancelled and downstream stages as SKIPPED."""
+        with self._lock:
+            if run_id not in self._runs:
+                return
+            state = self._runs[run_id]
+            state["status"] = "CANCELLED"
+            state["error"] = error
+            state["error_action"] = action
+            state["status_message"] = "Verification stopped by user."
+            cur = state.get("current_stage", "FACE_DETECTION")
+            if cur in STAGE_ORDER:
+                idx = STAGE_ORDER.index(cur)
+                for prior in STAGE_ORDER[:idx]:
+                    state["stages"][prior] = "PASSED"
+                state["stages"][cur] = "STOPPED"
+                for downstream in STAGE_ORDER[idx + 1:]:
+                    state["stages"][downstream] = "SKIPPED"
 
     def get_run(self, run_id: str) -> Optional[Dict[str, Any]]:
         with self._lock:
@@ -155,6 +314,7 @@ class RunStateTracker:
         with self._lock:
             self._runs.clear()
             self._latest_run_id = None
+            self._cancellations.clear()
 
     @staticmethod
     def _sanitize(data: Any) -> Any:
@@ -232,6 +392,17 @@ class FaceTraceRequestHandler(SimpleHTTPRequestHandler):
             except Exception:
                 pass
             self.send_error(HTTPStatus.NOT_FOUND, "Sample not found")
+        elif path.startswith("/uploads/"):
+            rel_path = path[len("/uploads/"):].lstrip("/")
+            try:
+                target = (UPLOADS_DIR / rel_path).resolve()
+                if target.is_file() and target.is_relative_to(UPLOADS_DIR.resolve()):
+                    mime, _ = mimetypes.guess_type(str(target))
+                    self.serve_file(target, mime or "image/jpeg")
+                    return
+            except Exception:
+                pass
+            self.send_error(HTTPStatus.NOT_FOUND, "Uploaded specimen not found")
         elif path == "/api/samples":
             self.handle_api_samples()
         elif path.startswith("/api/status/"):
@@ -252,6 +423,10 @@ class FaceTraceRequestHandler(SimpleHTTPRequestHandler):
 
         if path == "/api/verify":
             self.handle_api_verify()
+        elif path == "/api/stop":
+            self.handle_api_stop()
+        elif path == "/api/upload":
+            self.handle_api_upload()
         elif path == "/api/tamper-test":
             self.handle_api_tamper_test()
         elif path == "/api/reset":
@@ -307,6 +482,161 @@ class FaceTraceRequestHandler(SimpleHTTPRequestHandler):
         ]
         self.send_json({"samples": samples})
 
+    def handle_api_upload(self):
+        """Validates and stores custom face specimen uploads in temporary storage."""
+        content_len = int(self.headers.get("Content-Length", 0))
+        if content_len <= 0:
+            self.send_json({
+                "error": "Empty upload request.",
+                "error_action": "Select a valid image file to upload."
+            }, HTTPStatus.BAD_REQUEST)
+            return
+
+        # Max 8 MB HTTP payload limit (5 MB binary image after base64 overhead)
+        if content_len > 8 * 1024 * 1024:
+            self.send_json({
+                "error": "Upload exceeds maximum allowable payload size (5 MB limit).",
+                "error_action": "Select an image under 5 MB in size."
+            }, HTTPStatus.BAD_REQUEST)
+            return
+
+        content_type = self.headers.get("Content-Type", "").lower()
+        raw_bytes: Optional[bytes] = None
+        declared_mime: Optional[str] = None
+
+        if "application/json" in content_type:
+            payload = self._read_body_json()
+            b64_str = payload.get("image_base64") or payload.get("data") or ""
+            declared_mime = payload.get("content_type") or payload.get("mime_type")
+            if not b64_str:
+                self.send_json({
+                    "error": "No image data found in upload request.",
+                    "error_action": "Select a valid image file to upload."
+                }, HTTPStatus.BAD_REQUEST)
+                return
+
+            if "base64," in b64_str:
+                header, b64_data = b64_str.split("base64,", 1)
+                if not declared_mime and "data:" in header:
+                    declared_mime = header.split("data:", 1)[1].split(";", 1)[0].strip().lower()
+                b64_str = b64_data
+
+            try:
+                raw_bytes = base64.b64decode(b64_str)
+            except Exception:
+                self.send_json({
+                    "error": "Malformed base64 image data.",
+                    "error_action": "Ensure the image file is not corrupted."
+                }, HTTPStatus.BAD_REQUEST)
+                return
+        elif any(content_type.startswith(m) for m in ("image/jpeg", "image/png", "image/webp", "application/octet-stream")):
+            declared_mime = content_type.split(";")[0].strip()
+            raw_bytes = self.rfile.read(content_len)
+        else:
+            self.send_json({
+                "error": f"Unsupported upload Content-Type: '{content_type}'.",
+                "error_action": "Upload as JSON base64 or direct binary image stream."
+            }, HTTPStatus.BAD_REQUEST)
+            return
+
+        if not raw_bytes or len(raw_bytes) == 0:
+            self.send_json({
+                "error": "Uploaded image file is empty.",
+                "error_action": "Select a valid non-empty image file."
+            }, HTTPStatus.BAD_REQUEST)
+            return
+
+        if len(raw_bytes) > 5 * 1024 * 1024:
+            self.send_json({
+                "error": f"Decoded image size ({len(raw_bytes)} bytes) exceeds maximum allowable limit of 5 MB.",
+                "error_action": "Select an image under 5 MB in size."
+            }, HTTPStatus.BAD_REQUEST)
+            return
+
+        if declared_mime:
+            declared_mime = declared_mime.lower().strip()
+            if declared_mime not in ("image/jpeg", "image/jpg", "image/png", "image/webp", "application/octet-stream"):
+                self.send_json({
+                    "error": f"Unsupported declared MIME type '{declared_mime}'. Only JPEG, PNG, and WebP are supported.",
+                    "error_action": "Provide an image in JPEG, PNG, or WebP format."
+                }, HTTPStatus.BAD_REQUEST)
+                return
+
+        # Decode and verify with PIL
+        try:
+            test_img = Image.open(io.BytesIO(raw_bytes))
+            test_img.verify()
+        except Exception as e:
+            self.send_json({
+                "error": f"Malformed or corrupted image file: {str(e)}",
+                "error_action": "Ensure the selected file is an uncorrupted JPEG, PNG, or WebP image."
+            }, HTTPStatus.BAD_REQUEST)
+            return
+
+        try:
+            img = Image.open(io.BytesIO(raw_bytes))
+            fmt = (img.format or "").upper()
+            if fmt not in ("JPEG", "PNG", "WEBP"):
+                self.send_json({
+                    "error": f"Invalid image format '{fmt}'. FaceTrace strictly accepts only JPEG, PNG, and WebP images.",
+                    "error_action": "Convert image to standard JPEG, PNG, or WebP format."
+                }, HTTPStatus.BAD_REQUEST)
+                return
+
+            w, h = img.size
+            if w < 60 or h < 60:
+                self.send_json({
+                    "error": f"Image dimensions ({w}x{h}) are too small. Minimum required dimension is 60x60 pixels.",
+                    "error_action": "Provide a higher-resolution image showing a clear human face."
+                }, HTTPStatus.BAD_REQUEST)
+                return
+
+            if w > 4096 or h > 4096:
+                self.send_json({
+                    "error": f"Image dimensions ({w}x{h}) exceed maximum sanity limit of 4096x4096 pixels.",
+                    "error_action": "Resize the image below 4096x4096 pixels."
+                }, HTTPStatus.BAD_REQUEST)
+                return
+        except Exception as e:
+            self.send_json({
+                "error": f"Failed to inspect image dimensions: {str(e)}",
+                "error_action": "Select a valid image file."
+            }, HTTPStatus.BAD_REQUEST)
+            return
+
+        ext = "jpg" if fmt == "JPEG" else fmt.lower()
+        upload_id = f"custom_upload_{uuid.uuid4().hex[:12]}"
+        safe_filename = f"{upload_id}.{ext}"
+        safe_target = (UPLOADS_DIR / safe_filename).resolve()
+
+        if not safe_target.is_relative_to(UPLOADS_DIR.resolve()):
+            self.send_json({
+                "error": "Internal security path validation failure.",
+                "error_action": "Try uploading again."
+            }, HTTPStatus.INTERNAL_SERVER_ERROR)
+            return
+
+        try:
+            with open(safe_target, "wb") as f:
+                f.write(raw_bytes)
+        except Exception as e:
+            self.send_json({
+                "error": f"Failed to store temporary upload: {str(e)}",
+                "error_action": "Check filesystem permissions."
+            }, HTTPStatus.INTERNAL_SERVER_ERROR)
+            return
+
+        self.send_json({
+            "upload_id": upload_id,
+            "filename": safe_filename,
+            "url": f"/uploads/{safe_filename}",
+            "width": w,
+            "height": h,
+            "format": fmt,
+            "size_bytes": len(raw_bytes),
+            "message": "Custom face specimen validated and accepted."
+        }, HTTPStatus.CREATED)
+
     def handle_api_verify(self):
         """Initiates async verification pipeline execution."""
         payload = self._read_body_json()
@@ -327,11 +657,28 @@ class FaceTraceRequestHandler(SimpleHTTPRequestHandler):
         else:
             exec_mode = ExecutionMode.MOCK
 
-        raw_sample = str(payload.get("sample", "obama_ama.jpg"))
-        sample_name = Path(raw_sample).name
-        image_path = (SAMPLES_DIR / sample_name).resolve()
-        if not (image_path.is_file() and image_path.is_relative_to(SAMPLES_DIR.resolve())):
-            image_path = DEFAULT_IMAGE_PATH
+        # Specimen resolution: Custom Upload vs Benchmark Specimen
+        raw_upload_id = payload.get("upload_id")
+        if raw_upload_id:
+            safe_name = Path(str(raw_upload_id)).name
+            matching = list(UPLOADS_DIR.glob(f"{safe_name}*"))
+            if not matching and (UPLOADS_DIR / safe_name).is_file():
+                matching = [UPLOADS_DIR / safe_name]
+
+            if matching and matching[0].is_file() and matching[0].resolve().is_relative_to(UPLOADS_DIR.resolve()):
+                image_path = matching[0].resolve()
+            else:
+                self.send_json({
+                    "error": f"Uploaded specimen '{raw_upload_id}' not found or has expired.",
+                    "error_action": "Upload your custom face specimen again before starting verification."
+                }, HTTPStatus.BAD_REQUEST)
+                return
+        else:
+            raw_sample = str(payload.get("sample", "obama_ama.jpg"))
+            sample_name = Path(raw_sample).name
+            image_path = (SAMPLES_DIR / sample_name).resolve()
+            if not (image_path.is_file() and image_path.is_relative_to(SAMPLES_DIR.resolve())):
+                image_path = DEFAULT_IMAGE_PATH
 
         run_id = f"ft_run_{int(time.time())}_{uuid.uuid4().hex[:8]}"
         run_tracker.create_run(run_id, image_path, exec_mode)
@@ -366,22 +713,82 @@ class FaceTraceRequestHandler(SimpleHTTPRequestHandler):
                 mock=(mode == ExecutionMode.MOCK),
                 dry_run=(mode == ExecutionMode.DRY_RUN),
                 custom_run_id=run_id,
-                stage_callback=on_stage
+                stage_callback=on_stage,
+                cancellation_check=lambda: run_tracker.is_cancelled(run_id)
             )
 
-            if result.status in (PipelineStatus.SUCCESS, PipelineStatus.DEMO_NOT_FINAL):
+            if result.status == PipelineStatus.CANCELLED:
+                run_tracker.mark_cancelled(
+                    run_id,
+                    result.error or "Verification stopped by user.",
+                    result.error_action or "Click NEW VERIFICATION to start a new verification."
+                )
+            elif result.status in (PipelineStatus.SUCCESS, PipelineStatus.DEMO_NOT_FINAL):
                 run_tracker.complete_run(run_id, result.to_dict())
             else:
                 run_tracker.fail_run(
                     run_id,
                     result.error or "Pipeline execution failed.",
-                    result.error_action or "Review technical diagnostics.",
-                    result.stage.value if result.stage else ""
+                    result.error_action or "",
+                    result.stage.value if result.stage else "",
+                    title=result.error_title or "",
+                    investigation_summary=result.investigation_summary,
+                    result_dict=result.to_dict()
                 )
 
         except Exception as e:
             logger.exception("Worker execution error: %s", e)
             run_tracker.fail_run(run_id, str(e), "Check server logs.")
+
+    def handle_api_stop(self):
+        """Stops an active verification run cooperatively."""
+        payload = self._read_body_json()
+        run_id = payload.get("run_id")
+        if not run_id or not isinstance(run_id, str):
+            self.send_json({
+                "error": "Missing required parameter 'run_id'.",
+                "error_action": "Provide the active run ID to stop."
+            }, HTTPStatus.BAD_REQUEST)
+            return
+
+        run_id = run_id.strip()
+        if not re.match(r"^[a-zA-Z0-9_\-]+$", run_id):
+            self.send_json({
+                "error": "Invalid run ID format.",
+                "error_action": "Ensure run ID contains only alphanumeric characters, underscores, and hyphens."
+            }, HTTPStatus.BAD_REQUEST)
+            return
+
+        state = run_tracker.get_run(run_id)
+        if not state:
+            self.send_json({
+                "error": f"Run '{run_id}' not found or already purged.",
+                "error_action": "Verify run ID or start a new verification."
+            }, HTTPStatus.NOT_FOUND)
+            return
+
+        if state.get("status") in ("COMPLETE", "FAILED", "CANCELLED"):
+            self.send_json({
+                "status": state["status"],
+                "run_id": run_id,
+                "message": f"Run is already {state['status'].lower()}."
+            }, HTTPStatus.OK)
+            return
+
+        success = run_tracker.request_cancellation(run_id)
+        if success:
+            self.send_json({
+                "status": "CANCELLATION_REQUESTED",
+                "run_id": run_id,
+                "message": "Verification cancellation requested."
+            }, HTTPStatus.OK)
+        else:
+            cur_state = run_tracker.get_run(run_id) or {}
+            self.send_json({
+                "status": cur_state.get("status", "CANCELLED"),
+                "run_id": run_id,
+                "message": "Run is no longer actively processing."
+            }, HTTPStatus.OK)
 
     def handle_api_status(self, run_id: Optional[str]):
         """Returns the real-time execution state of the specified run or latest run."""
@@ -432,9 +839,21 @@ class FaceTraceRequestHandler(SimpleHTTPRequestHandler):
         })
 
     def handle_api_reset(self):
-        """Resets the UI state for another run."""
+        """Resets the UI state for another run and purges temporary uploads."""
         _ = self._read_body_json()
         run_tracker.reset()
+
+        # Purge temporary custom uploads for biometric privacy and zero permanent storage
+        try:
+            for p in UPLOADS_DIR.glob("*"):
+                if p.is_file() and p.name != ".gitkeep":
+                    try:
+                        p.unlink()
+                    except Exception:
+                        pass
+        except Exception as e:
+            logger.debug("Uploads cleanup exception: %s", e)
+
         self.send_json({"status": "RESET", "message": "Workstation reset for new verification."})
 
     def handle_api_run_artifact(self, run_id: str):

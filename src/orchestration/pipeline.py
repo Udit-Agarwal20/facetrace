@@ -11,7 +11,7 @@ import logging
 import os
 from pathlib import Path
 import time
-from typing import Optional, Dict, Any, Union
+from typing import Optional, Dict, Any, Union, Callable
 import uuid
 
 from PIL import Image
@@ -71,7 +71,8 @@ class FaceTracePipeline:
         no_cache: bool = False,
         output_path: Optional[Union[str, Path]] = None,
         custom_run_id: Optional[str] = None,
-        stage_callback: Optional[Any] = None
+        stage_callback: Optional[Any] = None,
+        cancellation_check: Optional[Callable[[], bool]] = None
     ) -> FaceTraceRunResult:
         """
         Executes the 16-stage end-to-end pipeline.
@@ -100,6 +101,31 @@ class FaceTracePipeline:
                     stage_callback(stage_val, msg)
                 except Exception as cb_err:
                     logger.debug("stage_callback error: %s", cb_err)
+
+        def is_cancelled() -> bool:
+            if cancellation_check:
+                try:
+                    return bool(cancellation_check())
+                except Exception as ex:
+                    logger.debug("cancellation_check error: %s", ex)
+            return False
+
+        def make_cancelled_result(reason: str = "Verification stopped by user.") -> FaceTraceRunResult:
+            notify(PipelineStage.CANCELLED.value, reason)
+            timings.total_ms = (time.time() - total_start) * 1000.0
+            return FaceTraceRunResult(
+                run_id=run_id,
+                status=PipelineStatus.CANCELLED,
+                stage=PipelineStage.CANCELLED,
+                execution_mode=mode,
+                error=reason,
+                error_action="Click NEW VERIFICATION to start a new verification.",
+                timings_ms=timings,
+                history=history
+            )
+
+        if is_cancelled():
+            return make_cancelled_result()
 
         if stage_callback:
             try:
@@ -169,6 +195,9 @@ class FaceTracePipeline:
         # ----------------------------------------------------------------------
         # [3] Face Detection & Embedding (Step 1)
         # ----------------------------------------------------------------------
+        if is_cancelled():
+            return make_cancelled_result()
+
         face_start = time.time()
         engine = self.face_engine or FaceEngine()
         det_result = engine.detect_and_embed(target_image)
@@ -206,6 +235,9 @@ class FaceTracePipeline:
         # ----------------------------------------------------------------------
         # [4] Reverse Image Search & Multi-Level Verification (Step 2)
         # ----------------------------------------------------------------------
+        if is_cancelled():
+            return make_cancelled_result()
+
         notify(PipelineStage.SEARCH_RUNNING.value)
         search_start = time.time()
 
@@ -262,18 +294,40 @@ class FaceTracePipeline:
         # ----------------------------------------------------------------------
         # [5] Candidate Selection & Social Compliance Check
         # ----------------------------------------------------------------------
+        if is_cancelled():
+            return make_cancelled_result()
+
         selected = step2_result.selected_candidate
+        inv_summary = step2_result.investigation_summary
         if not selected:
             notify(PipelineStage.NO_MATCH.value)
             timings.total_ms = (time.time() - total_start) * 1000.0
+
+            raw_count = 0
+            if step2_result.metrics and "raw_candidate_count" in step2_result.metrics:
+                raw_count = step2_result.metrics.get("raw_candidate_count", 0)
+            elif step2_result.all_candidates:
+                raw_count = len(step2_result.all_candidates)
+
+            if raw_count == 0:
+                # CASE 1: Provider returns zero candidates
+                err_title = "NO PUBLIC WEB MATCH FOUND"
+                err_desc = "The reverse-image provider returned no indexed matches for this image."
+            else:
+                # CASE 2: Provider returns candidates, but none pass FaceTrace verification / Task 3 requirements
+                err_title = "NO QUALIFYING PUBLIC MATCH"
+                err_desc = "The search returned visually related web images, but no candidate matched the submitted face or satisfied the required social-post provenance."
+
             return FaceTraceRunResult(
                 run_id=run_id,
                 status=PipelineStatus.FAILED,
                 stage=PipelineStage.NO_MATCH,
                 execution_mode=mode,
-                error="No reverse-image candidate discovered.",
-                error_action="Target face was not indexed by reverse search provider.",
+                error=err_desc,
+                error_action="",
+                error_title=err_title,
                 timings_ms=timings,
+                investigation_summary=inv_summary,
                 history=history
             )
         notify(PipelineStage.CANDIDATE_SELECTED.value)
@@ -284,6 +338,49 @@ class FaceTracePipeline:
         allowed_states = ("TASK3_SOCIAL_MATCH",) if mode == ExecutionMode.LIVE else ("TASK3_SOCIAL_MATCH", "TEST_ONLY")
         if comp_state not in allowed_states:
             notify(PipelineStage.SOCIAL_REQUIREMENT_FAILED.value)
+
+            # BEST-EFFORT FORENSIC INVESTIGATION: If candidate is a verified web match (e.g. IMDb, ArcFace 0.9910),
+            # advance to INDEPENDENT_VERIFICATION to evaluate and record the biometric match,
+            # while ensuring downstream EVIDENCE and BLOCKCHAIN stages remain SKIPPED due to lack of social provenance.
+            cand_verif = selected.get("verification") or {}
+            face_verified = cand_verif.get("face_verified", False)
+            verif_state = cand_verif.get("verification_state") or cand_verif.get("classification")
+            face_sim = cand_verif.get("face_similarity")
+
+            if comp_state == "WEB_MATCH_ONLY" and face_verified and verif_state in ("VERIFIED_EXACT", "VERIFIED_DERIVATIVE", "VERIFIED_FACE_MATCH"):
+                notify(PipelineStage.FACE_VERIFICATION_PASSED.value)
+                timings.total_ms = (time.time() - total_start) * 1000.0
+                cand_summary = CandidateSummary(
+                    platform=selected.get("platform") or "web",
+                    post_url=selected.get("page_url", ""),
+                    image_url=selected.get("image_url", "")
+                )
+                verif_summary = VerificationSummary(
+                    face_similarity=face_sim,
+                    sha256_exact=cand_verif.get("sha256_exact", False),
+                    phash_distance=cand_verif.get("phash_distance"),
+                    state=str(verif_state)
+                )
+                return FaceTraceRunResult(
+                    run_id=run_id,
+                    status=PipelineStatus.FAILED,
+                    stage=PipelineStage.SOCIAL_REQUIREMENT_FAILED,
+                    execution_mode=mode,
+                    discovery_type="image_provenance",
+                    verification_type=verif_summary.state,
+                    task3_compliance=comp_state,
+                    candidate=cand_summary,
+                    verification=verif_summary,
+                    blockchain=None,
+                    tamper_test=None,
+                    timings_ms=timings,
+                    investigation_summary=inv_summary,
+                    error_title="NO QUALIFYING PUBLIC MATCH",
+                    error="Candidate face independently verified on public web source, but no candidate satisfied the required social-post provenance for blockchain anchoring.",
+                    error_action="",
+                    history=history
+                )
+
             timings.total_ms = (time.time() - total_start) * 1000.0
             return FaceTraceRunResult(
                 run_id=run_id,
@@ -291,9 +388,11 @@ class FaceTracePipeline:
                 stage=PipelineStage.SOCIAL_REQUIREMENT_FAILED,
                 execution_mode=mode,
                 task3_compliance=comp_state or "NON_COMPLIANT",
-                error=comp_info.get("reason") or f"Social compliance gate failed: {comp_state}",
-                error_action="Candidate is not a qualifying public post URL on a supported social platform.",
+                error_title="NO QUALIFYING PUBLIC MATCH",
+                error="The search returned visually related web images, but no candidate matched the submitted face or satisfied the required social-post provenance.",
+                error_action="",
                 timings_ms=timings,
+                investigation_summary=inv_summary,
                 history=history
             )
         notify(PipelineStage.SOCIAL_COMPLIANCE_PASSED.value)
@@ -301,6 +400,9 @@ class FaceTracePipeline:
         # ----------------------------------------------------------------------
         # [6] Independent Verification Check
         # ----------------------------------------------------------------------
+        if is_cancelled():
+            return make_cancelled_result()
+
         cand_verif = selected.get("verification") or {}
         verif_state = cand_verif.get("verification_state") or cand_verif.get("classification")
         face_verified = cand_verif.get("face_verified", False)
@@ -325,6 +427,9 @@ class FaceTracePipeline:
         # ----------------------------------------------------------------------
         # [7] Evidence Validation, Canonicalization & Commitment
         # ----------------------------------------------------------------------
+        if is_cancelled():
+            return make_cancelled_result()
+
         evidence_dict = step2_result.to_dict()
         if mode != ExecutionMode.LIVE and evidence_dict.get("task3_compliance", {}).get("state") == "TEST_ONLY":
             evidence_dict["task3_compliance"]["state"] = "TASK3_SOCIAL_MATCH"
@@ -379,6 +484,10 @@ class FaceTracePipeline:
                     timings_ms=timings,
                     history=history
                 )
+
+        # Anti-false-pass and cancellation check before transaction submission
+        if is_cancelled():
+            return make_cancelled_result("Verification cancelled before blockchain submission.")
 
         if dry_run:
             # Dry run simulation: Do not submit real transaction
@@ -540,6 +649,7 @@ class FaceTracePipeline:
             tamper_test=tamper_summary,
             timings_ms=timings,
             evidence=evidence_dict,
+            investigation_summary=inv_summary,
             error=None,
             history=history
         )

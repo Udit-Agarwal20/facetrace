@@ -18,7 +18,8 @@ from .models import (
     VerificationClassification,
     ExecutionMode,
     DiscoveryType,
-    Task3ComplianceState
+    Task3ComplianceState,
+    CandidateOutcome
 )
 from .compliance import evaluate_task3_candidate
 from .query_variants import QueryVariantGenerator
@@ -47,7 +48,9 @@ class SearchOrchestrator:
         ranker: Optional[CandidateRanker] = None,
         verifier: Optional[MultiLevelVerifier] = None,
         cache: Optional[SearchCache] = None,
-        max_verification_candidates: int = 10
+        max_verification_candidates: int = 25,
+        max_social_candidates: int = 15,
+        max_web_candidates: int = 10
     ):
         self.provider = provider or GoogleVisionProvider()
         self.query_generator = query_generator or QueryVariantGenerator()
@@ -57,6 +60,8 @@ class SearchOrchestrator:
         self.verifier = verifier or MultiLevelVerifier()
         self.cache = cache or SearchCache()
         self.max_verification_candidates = max_verification_candidates
+        self.max_social_candidates = max_social_candidates
+        self.max_web_candidates = max_web_candidates
 
     def search(
         self,
@@ -178,7 +183,31 @@ class SearchOrchestrator:
             else:
                 status = "NO_SOCIAL_MATCH_FOUND"
                 comp_state = Task3ComplianceState.NO_SOCIAL_MATCH
-                reason_msg = "Google Vision returned 0 search candidates."
+                reason_msg = "The reverse-image provider returned no indexed matches for this image."
+
+            empty_summary = {
+                "total_discovered": 0,
+                "unique_candidates": 0,
+                "social_candidates": 0,
+                "candidates_analyzed": 0,
+                "verified_web_matches": 0,
+                "qualifying_social_matches": 0,
+                "unreachable_candidates": 0,
+                "rejected_candidates": 0,
+                "disqualified_candidates": 0,
+                "budget_skipped": 0,
+                "budget_skipped_candidates": 0,
+                "strongest_match": "None",
+                "strongest_web_match": None,
+                "strongest_social_match": None,
+                "social_evidence": "Search provider error encountered." if provider_errors else "No indexed matches returned by provider.",
+                "social_evidence_note": (
+                    "Search provider error encountered." if provider_errors else "No indexed matches returned by provider."
+                ),
+                "task3_evidence": "NOT ESTABLISHED",
+                "task3_status": "NOT ESTABLISHED",
+                "blockchain_status": "NOT ANCHORED (No qualifying evidence available)"
+            }
 
             logger.info(f"[{job_id}] Search finished with 0 candidates returned ({status}).")
             return Step2Output(
@@ -208,7 +237,8 @@ class SearchOrchestrator:
                     "execution_mode": execution_mode.value
                 },
                 all_candidates=[],
-                metrics={"raw_candidate_count": 0, "deduplicated_count": 0}
+                metrics={"raw_candidate_count": 0, "deduplicated_count": 0},
+                investigation_summary=empty_summary
             )
 
         # ----------------------------------------------------------------------
@@ -228,19 +258,55 @@ class SearchOrchestrator:
         # ----------------------------------------------------------------------
         # 6. Multi-Level Verification Ladder & Task 3 Hard Compliance Gating
         # ----------------------------------------------------------------------
-        candidates_to_verify = ranked[:self.max_verification_candidates]
+        # Partition candidates into social pool and general-web pool
+        social_pool = [c for c in ranked if c.is_social_domain]
+        web_pool = [c for c in ranked if not c.is_social_domain]
+
+        # Prioritize social candidates up to max_social_candidates and total cap
+        social_budget = min(len(social_pool), self.max_social_candidates, self.max_verification_candidates)
+        social_to_verify = social_pool[:social_budget]
+
+        remaining_budget = max(0, self.max_verification_candidates - len(social_to_verify))
+        web_budget = min(len(web_pool), self.max_web_candidates, remaining_budget)
+        web_to_verify = web_pool[:web_budget]
+
+        candidates_to_verify = social_to_verify + web_to_verify
+        verified_candidate_ids = {c.candidate_id for c in candidates_to_verify}
+
+        # Mark all candidates not selected for analysis due to budget
+        for c in ranked:
+            if c.candidate_id not in verified_candidate_ids:
+                c.candidate_outcome = CandidateOutcome.NOT_ATTEMPTED_DUE_TO_BUDGET.value
+                c.outcome_reason = "Candidate was not analyzed because verification budget was reached."
+
         qualifying_social_posts: List[DiscoveredCandidate] = []
         web_matches_only: List[DiscoveredCandidate] = []
         failed_candidates: List[DiscoveredCandidate] = []
 
-        logger.info(f"[{job_id}] Running verification ladder & compliance gate on top {len(candidates_to_verify)} ranked candidates...")
+        logger.info(
+            f"[{job_id}] Running best-effort verification on {len(candidates_to_verify)} candidates "
+            f"(budget: {len(social_to_verify)} social, {len(web_to_verify)} web)..."
+        )
         for cand in candidates_to_verify:
-            # Run image/face verification
-            details = self.verifier.verify(
-                candidate=cand,
-                original_image_path=original_img_path,
-                query_face=request.face
-            )
+            try:
+                # Run image/face verification
+                details = self.verifier.verify(
+                    candidate=cand,
+                    original_image_path=original_img_path,
+                    query_face=request.face
+                )
+            except Exception as e:
+                logger.warning(f"[{job_id}] Verification error on candidate {cand.candidate_id}: {e}")
+                err_str = str(e).lower()
+                if any(x in err_str for x in ["400", "403", "404", "timeout", "unreachable", "inaccessible", "connection", "bad request"]):
+                    cand.candidate_outcome = CandidateOutcome.UNREACHABLE.value
+                    cand.outcome_reason = f"Candidate asset unreachable: {e}"
+                else:
+                    cand.candidate_outcome = CandidateOutcome.VERIFICATION_ERROR.value
+                    cand.outcome_reason = f"Verification exception: {e}"
+                failed_candidates.append(cand)
+                continue
+
             cand.verification = details
 
             # Evaluate against mandatory Task 3 Compliance Gates
@@ -254,17 +320,48 @@ class SearchOrchestrator:
             )
             cand.task3_compliance = comp_details
 
-            # Categorize candidates
-            if comp_details.state == Task3ComplianceState.TASK3_SOCIAL_MATCH:
+            # Classify candidate outcome
+            retrieval = cand.retrieval or details.retrieval
+            is_unreachable = (
+                not retrieval
+                or not retrieval.source_reachable
+                or not retrieval.evidence_retrieved
+                or not retrieval.image_valid
+            )
+
+            if is_unreachable:
+                cand.candidate_outcome = CandidateOutcome.UNREACHABLE.value
+                cand.outcome_reason = (retrieval.error if retrieval else None) or details.explanation or "Candidate image unreachable or invalid"
+                failed_candidates.append(cand)
+                logger.info(f"[{job_id}] Candidate {cand.candidate_id} unreachable: {cand.outcome_reason}")
+            elif comp_details.state == Task3ComplianceState.TASK3_SOCIAL_MATCH:
+                cand.candidate_outcome = CandidateOutcome.VERIFIED_MATCH.value
+                cand.outcome_reason = comp_details.reason
                 qualifying_social_posts.append(cand)
                 logger.info(f"[{job_id}] Candidate {cand.candidate_id} passed TASK 3 COMPLIANCE GATE: {cand.platform} post (similarity: {details.face_similarity})")
             elif comp_details.state in (Task3ComplianceState.TEST_ONLY, Task3ComplianceState.NOT_FINAL_TASK3_PASS):
+                cand.candidate_outcome = CandidateOutcome.VERIFIED_MATCH.value
+                cand.outcome_reason = comp_details.reason
                 qualifying_social_posts.append(cand)
                 logger.info(f"[{job_id}] Candidate {cand.candidate_id} passed test criteria in mode {comp_details.state.value}")
             elif comp_details.state == Task3ComplianceState.WEB_MATCH_ONLY:
+                cand.candidate_outcome = CandidateOutcome.VERIFIED_WEB_MATCH.value
+                cand.outcome_reason = comp_details.reason
                 web_matches_only.append(cand)
-                logger.info(f"[{job_id}] Candidate {cand.candidate_id} verified as WEB_MATCH_ONLY (non-social domain)")
+                logger.info(f"[{job_id}] Candidate {cand.candidate_id} verified as WEB_MATCH_ONLY (similarity: {details.face_similarity})")
+            elif cand.is_social_domain and not cand.is_post_url:
+                cand.candidate_outcome = CandidateOutcome.TASK3_DISQUALIFIED.value
+                cand.outcome_reason = comp_details.reason
+                failed_candidates.append(cand)
+                logger.info(f"[{job_id}] Candidate {cand.candidate_id} disqualified: social domain but not a post URL")
+            elif not cand.is_social_domain and not details.face_verified:
+                cand.candidate_outcome = CandidateOutcome.REJECTED.value
+                cand.outcome_reason = details.explanation or "Face similarity below threshold on web match"
+                failed_candidates.append(cand)
+                logger.info(f"[{job_id}] Candidate {cand.candidate_id} rejected: {cand.outcome_reason}")
             else:
+                cand.candidate_outcome = CandidateOutcome.REJECTED.value
+                cand.outcome_reason = comp_details.reason or details.explanation or "Candidate failed verification"
                 failed_candidates.append(cand)
                 logger.info(f"[{job_id}] Candidate {cand.candidate_id} rejected: {comp_details.reason}")
 
@@ -306,9 +403,75 @@ class SearchOrchestrator:
             task3_compliance_output = {
                 "state": Task3ComplianceState.NO_SOCIAL_MATCH.value,
                 "passed": False,
-                "failed_gates": ["NO_MATCH (Zero candidates satisfied image verification and Task 3 compliance requirements)"],
-                "reason": "Zero candidates satisfied image verification and Task 3 compliance requirements."
+                "failed_gates": ["NO_MATCH (The search returned visually related web images, but no candidate matched the submitted face or satisfied the required social-post provenance)"],
+                "reason": "The search returned visually related web images, but no candidate matched the submitted face or satisfied the required social-post provenance."
             }
+
+        # Compute forensic investigation summary
+        unreachable_count = sum(1 for c in ranked if c.candidate_outcome == CandidateOutcome.UNREACHABLE.value)
+        rejected_count = sum(1 for c in ranked if c.candidate_outcome == CandidateOutcome.REJECTED.value)
+        disqualified_count = sum(1 for c in ranked if c.candidate_outcome == CandidateOutcome.TASK3_DISQUALIFIED.value)
+        verified_social_count = len(qualifying_social_posts)
+        verified_web_count = len(web_matches_only)
+        budget_skipped_count = sum(1 for c in ranked if c.candidate_outcome == CandidateOutcome.NOT_ATTEMPTED_DUE_TO_BUDGET.value)
+        analyzed_count = len(candidates_to_verify)
+
+        strongest_web = None
+        if web_matches_only:
+            best_web = sorted(web_matches_only, key=lambda c: (c.verification.face_similarity or 0.0), reverse=True)[0]
+            strongest_web = {
+                "platform": best_web.platform or best_web.page_url,
+                "page_url": best_web.page_url,
+                "face_similarity": best_web.verification.face_similarity if best_web.verification else None,
+                "classification": best_web.verification.classification.value if best_web.verification else None
+            }
+
+        strongest_social = None
+        if qualifying_social_posts:
+            best_social = sorted(qualifying_social_posts, key=lambda c: (c.verification.face_similarity or 0.0), reverse=True)[0]
+            strongest_social = {
+                "platform": best_social.platform,
+                "page_url": best_social.page_url,
+                "face_similarity": best_social.verification.face_similarity if best_social.verification else None,
+                "classification": best_social.verification.classification.value if best_social.verification else None
+            }
+
+        if verified_social_count > 0:
+            social_evidence_note = f"Verified qualifying social post discovered on {strongest_social['platform'].capitalize()}."
+        elif social_count > 0 and unreachable_count > 0:
+            social_evidence_note = f"Discovered {social_count} social candidates, but media assets could not be independently retrieved (platform anti-crawler restrictions)."
+        elif social_count > 0:
+            social_evidence_note = f"Discovered {social_count} social candidates, but none met content post criteria or matched face."
+        else:
+            social_evidence_note = "No social candidates indexed by provider."
+
+        strongest_label = "None"
+        if strongest_social and strongest_social.get("face_similarity") is not None:
+            strongest_label = f"{strongest_social['platform']} — ArcFace {strongest_social['face_similarity']:.4f}"
+        elif strongest_web and strongest_web.get("face_similarity") is not None:
+            strongest_label = f"{strongest_web['platform']} — ArcFace {strongest_web['face_similarity']:.4f}"
+
+        investigation_summary = {
+            "total_discovered": raw_count,
+            "unique_candidates": dedup_count,
+            "social_candidates": social_count,
+            "candidates_analyzed": analyzed_count,
+            "verified_web_matches": verified_web_count,
+            "qualifying_social_matches": verified_social_count,
+            "unreachable_candidates": unreachable_count,
+            "rejected_candidates": rejected_count,
+            "disqualified_candidates": disqualified_count,
+            "budget_skipped": budget_skipped_count,
+            "budget_skipped_candidates": budget_skipped_count,
+            "strongest_match": strongest_label,
+            "strongest_web_match": strongest_web,
+            "strongest_social_match": strongest_social,
+            "social_evidence": social_evidence_note,
+            "social_evidence_note": social_evidence_note,
+            "task3_evidence": "QUALIFYING EVIDENCE ESTABLISHED" if verified_social_count > 0 else "NOT ESTABLISHED",
+            "task3_status": "ESTABLISHED" if verified_social_count > 0 else "NOT ESTABLISHED",
+            "blockchain_status": "ANCHORED ON BASE SEPOLIA" if verified_social_count > 0 else "NOT ANCHORED (No qualifying social evidence available)"
+        }
 
         total_latency_ms = (time.time() - total_start) * 1000
         discovered_ts = now_iso
@@ -346,8 +509,11 @@ class SearchOrchestrator:
                 "verified_candidate_count": len(qualifying_social_posts) + len(web_matches_only),
                 "qualifying_social_post_count": len(qualifying_social_posts),
                 "web_matches_only_count": len(web_matches_only),
+                "unreachable_count": unreachable_count,
+                "budget_skipped_count": budget_skipped_count,
                 "total_latency_ms": round(total_latency_ms, 1)
-            }
+            },
+            investigation_summary=investigation_summary
         )
 
         logger.info(

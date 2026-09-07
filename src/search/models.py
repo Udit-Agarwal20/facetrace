@@ -46,6 +46,17 @@ class Task3ComplianceState(str, Enum):
     TEST_ONLY = "TEST_ONLY"
 
 
+class CandidateOutcome(str, Enum):
+    VERIFIED_MATCH = "VERIFIED_MATCH"
+    VERIFIED_WEB_MATCH = "VERIFIED_WEB_MATCH"
+    UNREACHABLE = "UNREACHABLE"
+    REJECTED = "REJECTED"
+    VERIFICATION_ERROR = "VERIFICATION_ERROR"
+    NOT_SOCIAL = "NOT_SOCIAL"
+    TASK3_DISQUALIFIED = "TASK3_DISQUALIFIED"
+    NOT_ATTEMPTED_DUE_TO_BUDGET = "NOT_ATTEMPTED_DUE_TO_BUDGET"
+
+
 @dataclass
 class RetrievalDetails:
     source_reachable: bool = False
@@ -172,6 +183,8 @@ class DiscoveredCandidate:
     verification: Optional[VerificationDetails] = None
     retrieval: Optional[RetrievalDetails] = None
     task3_compliance: Optional[Task3ComplianceDetails] = None
+    candidate_outcome: Optional[str] = None
+    outcome_reason: Optional[str] = None
     raw_metadata: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -189,6 +202,8 @@ class DiscoveredCandidate:
             "is_social_domain": self.is_social_domain,
             "is_post_url": self.is_post_url,
             "retrieval_score": round(self.retrieval_score, 4),
+            "candidate_outcome": self.candidate_outcome,
+            "outcome_reason": self.outcome_reason,
             "retrieval": self.retrieval.to_dict() if self.retrieval else (self.verification.retrieval.to_dict() if self.verification and self.verification.retrieval else None),
             "verification": self.verification.to_dict() if self.verification else None,
             "task3_compliance": self.task3_compliance.to_dict() if self.task3_compliance else None
@@ -207,6 +222,7 @@ class Step2Output:
     schema_version: str = "1.0"
     all_candidates: List[Dict[str, Any]] = field(default_factory=list)
     metrics: Dict[str, Any] = field(default_factory=dict)
+    investigation_summary: Optional[Dict[str, Any]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -220,5 +236,6 @@ class Step2Output:
             "verification": (self.selected_candidate.get("verification") if self.selected_candidate else None),
             "provenance": self.provenance,
             "all_candidates": self.all_candidates,
-            "metrics": self.metrics
+            "metrics": self.metrics,
+            "investigation_summary": self.investigation_summary
         }

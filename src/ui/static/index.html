@@ -94,6 +94,33 @@
       <div class="panel-body input-grid">
         <!-- Sample Selection & Controls -->
         <div class="input-controls">
+          <!-- Custom Specimen Upload -->
+          <div class="custom-upload-section">
+            <input type="file" id="faceFileInput" accept="image/jpeg,image/png,image/webp" style="display: none;">
+            <button type="button" id="uploadBtn" class="upload-btn">
+              <span class="btn-icon">📁</span> [ + UPLOAD FACE IMAGE ]
+            </button>
+            <div id="customUploadCard" class="sample-card custom-card" style="display: none;">
+              <div class="sample-thumb-wrapper">
+                <img id="customThumbImg" src="" alt="Custom specimen" class="sample-thumb">
+              </div>
+              <div class="sample-info">
+                <div class="custom-badge-row">
+                  <span class="badge badge-custom">CUSTOM UPLOAD</span>
+                </div>
+                <div class="sample-name" id="customFileName">custom_specimen.jpg</div>
+                <div class="sample-desc" id="customFileMeta">Validated face specimen</div>
+              </div>
+              <div class="sample-check">✓</div>
+            </div>
+          </div>
+
+          <div class="divider-row">
+            <span class="divider-line"></span>
+            <span class="divider-label">OR</span>
+            <span class="divider-line"></span>
+          </div>
+
           <div class="control-header-row">
             <label class="control-label">BENCHMARK CONSENTED SAMPLES</label>
             <span class="control-sublabel">Task 3 Calibrated Specimens</span>
@@ -152,10 +179,13 @@
         <!-- Query Image Preview Card -->
         <div class="input-preview-card">
           <div class="preview-header">
-            <span class="preview-label">TARGET QUERY SPECIMEN</span>
+            <div class="preview-title-group" style="display: flex; align-items: center; gap: 8px;">
+              <span class="preview-label">TARGET QUERY SPECIMEN</span>
+              <span id="customUploadBadge" class="badge badge-custom" style="display: none;">CUSTOM UPLOAD</span>
+            </div>
             <span class="badge badge-subtle" id="querySpecimenDimensions">640 × 640</span>
           </div>
-          <div class="preview-viewport">
+          <div class="preview-viewport" id="previewViewport" tabindex="0" role="region" aria-label="Target specimen preview. Drag to pan, use + / − or mouse wheel to zoom.">
             <img id="queryPreviewImg" src="/samples/obama_ama.jpg" alt="Query face" class="preview-img">
             <div class="reticle-overlay">
               <div class="reticle-crosshair top-left"></div>
@@ -165,6 +195,29 @@
               <div class="reticle-center"></div>
             </div>
           </div>
+
+          <!-- Preview Framing Controls Toolbar -->
+          <div class="preview-framing-toolbar">
+            <div class="framing-btn-group" role="toolbar" aria-label="Specimen Framing Controls">
+              <button type="button" class="btn-framing" id="zoomOutBtn" aria-label="Zoom out" title="Zoom out (−)">
+                <span class="framing-symbol">−</span>
+              </button>
+              <span class="zoom-level-pill mono" id="zoomLevelDisplay" aria-live="polite">100%</span>
+              <button type="button" class="btn-framing" id="zoomInBtn" aria-label="Zoom in" title="Zoom in (+)">
+                <span class="framing-symbol">+</span>
+              </button>
+              <button type="button" class="btn-framing btn-framing-text active" id="fitBtn" aria-label="Fit to frame" title="Fit entire image to preview">
+                FIT
+              </button>
+              <button type="button" class="btn-framing btn-framing-text" id="resetFramingBtn" aria-label="Reset framing" title="Reset framing to default">
+                RESET
+              </button>
+            </div>
+            <div class="preview-helper-text">
+              Drag to reposition • Use + / − to zoom
+            </div>
+          </div>
+
           <div class="preview-footer">
             <span class="preview-footnote">Local ArcFace 512-D Normalization</span>
           </div>
@@ -224,7 +277,7 @@
               <span class="node-num">04</span>
               <span class="node-status-badge badge-pending">PENDING</span>
             </div>
-            <div class="node-label">INDEPENDENT VERIFY</div>
+            <div class="node-label" title="INDEPENDENT VERIFICATION" aria-label="Stage 04: Independent Verification">INDEPENDENT VERIFY</div>
             <div class="node-detail">ArcFace cosine sim ≥ 0.72</div>
           </div>
           <div class="pipeline-connector"></div>
@@ -271,13 +324,147 @@
       </div>
     </section>
 
-    <!-- FAILURE BANNER (Shown only on error) -->
+    <!-- FORENSIC INVESTIGATION SUMMARY PANEL (Shown on all completed runs) -->
+    <section id="investigationSummaryPanel" class="panel workstation-panel investigation-summary-panel" style="display: none;">
+      <div class="panel-header">
+        <div class="panel-title-group">
+          <span class="step-badge" id="invSummaryStepBadge">FORENSIC TELEMETRY</span>
+          <h2 class="panel-title" id="invSummaryHeaderTitle">INVESTIGATION COMPLETE</h2>
+        </div>
+        <div class="badge" id="invSummaryStatusBadge">COMPLETED</div>
+      </div>
+
+      <div class="panel-body">
+        <!-- Section 1: CANDIDATE ACCOUNTING -->
+        <div class="inv-summary-section">
+          <div class="inv-section-header">
+            <span class="inv-section-title">CANDIDATE ACCOUNTING</span>
+            <span class="inv-section-formula mono">
+              <span id="sumMetricUniqueEq">0</span> UNIQUE = <span id="sumMetricAnalyzedEq">0</span> ATTEMPTED + <span id="sumMetricBudgetSkippedEq">0</span> BUDGET SKIPPED
+            </span>
+          </div>
+
+          <div class="accounting-grid">
+            <!-- Discovered -->
+            <div class="accounting-card">
+              <span class="accounting-val mono" id="sumMetricDiscovered">0</span>
+              <span class="accounting-lbl">DISCOVERED</span>
+              <span class="accounting-sublbl">Raw Vision Pool</span>
+            </div>
+
+            <!-- Unique -->
+            <div class="accounting-card">
+              <span class="accounting-val mono" id="sumMetricUnique">0</span>
+              <span class="accounting-lbl">UNIQUE</span>
+              <span class="accounting-sublbl">Canonical URLs</span>
+            </div>
+
+            <!-- Analysis: Attempted with Subset Breakdown -->
+            <div class="accounting-card accounting-card-analysis">
+              <div class="analysis-primary-row">
+                <span class="accounting-val mono" id="sumMetricAnalyzed">0</span>
+                <span class="accounting-lbl">ATTEMPTED</span>
+              </div>
+              <div class="analysis-sub-breakdown">
+                <div class="sub-breakdown-row sub-row-success">
+                  <span class="sub-bullet">↳</span>
+                  <span class="sub-val mono" id="sumMetricSuccessAnalyzed">0</span>
+                  <span class="sub-lbl">successfully analyzed</span>
+                </div>
+                <div class="sub-breakdown-row sub-row-warning">
+                  <span class="sub-bullet">↳</span>
+                  <span class="sub-val mono" id="sumMetricUnreachable">0</span>
+                  <span class="sub-lbl">unreachable (subset)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Not Attempted / Budget Skipped -->
+            <div class="accounting-card">
+              <span class="accounting-val mono" id="sumMetricBudgetSkipped">0</span>
+              <span class="accounting-lbl">NOT ATTEMPTED</span>
+              <span class="accounting-sublbl">Budget Skipped</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: VERIFICATION RESULTS -->
+        <div class="inv-summary-section">
+          <div class="inv-section-header">
+            <span class="inv-section-title">VERIFICATION RESULTS</span>
+            <span class="inv-section-sub">Independent ArcFace Biometric Evaluation</span>
+          </div>
+          <div class="verification-results-grid">
+            <div class="res-stat-card">
+              <div class="res-stat-val mono" id="sumMetricWebMatches">0</div>
+              <div class="res-stat-lbl">VERIFIED WEB MATCHES</div>
+              <div class="res-stat-desc">ArcFace cosine sim &ge; 0.72</div>
+            </div>
+            <div class="res-stat-card">
+              <div class="res-stat-val mono" id="sumMetricSocialMatches">0</div>
+              <div class="res-stat-lbl">QUALIFYING SOCIAL MATCHES</div>
+              <div class="res-stat-desc">Reddit / X / Instagram posts</div>
+            </div>
+            <div class="res-stat-card res-stat-strongest">
+              <div class="res-stat-lbl-subtle">STRONGEST VERIFIED MATCH</div>
+              <div class="res-stat-val-text mono" id="sumStrongestMatch">None</div>
+              <div class="res-stat-desc" id="sumStrongestMatchDesc">Local ArcFace comparison</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sections 3 & 4: TASK 3 PROVENANCE & BLOCKCHAIN AUDIT -->
+        <div class="inv-details-grid">
+          <!-- TASK 3 PROVENANCE -->
+          <div class="inv-detail-col">
+            <div class="inv-section-header">
+              <span class="inv-section-title">TASK 3 PROVENANCE</span>
+            </div>
+            <div class="detail-box">
+              <div class="findings-row">
+                <span class="findings-key">SOCIAL EVIDENCE:</span>
+                <span class="findings-val" id="sumSocialEvidence">None</span>
+              </div>
+              <div class="findings-row">
+                <span class="findings-key">QUALIFICATION STATUS:</span>
+                <span class="findings-val font-semibold" id="sumTask3Status">NOT ESTABLISHED</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- BLOCKCHAIN AUDIT -->
+          <div class="inv-detail-col">
+            <div class="inv-section-header">
+              <span class="inv-section-title">BLOCKCHAIN AUDIT</span>
+            </div>
+            <div class="detail-box">
+              <div class="findings-row">
+                <span class="findings-key">ANCHOR STATUS:</span>
+                <span class="findings-val font-semibold" id="sumBlockchainStatus">NOT ANCHORED</span>
+              </div>
+              <div class="findings-row">
+                <span class="findings-key">INTEGRITY CHECK:</span>
+                <span class="findings-val font-semibold" id="sumIntegrityStatus">NOT APPLICABLE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAILURE BANNER (Shown only on error, cancellation, or web-match-only) -->
     <div id="errorBanner" class="error-banner" style="display: none;">
-      <div class="error-icon">✕</div>
+      <div class="error-icon" id="errorIcon">✕</div>
       <div class="error-content">
         <div class="error-title" id="errorTitle">VERIFICATION FAILURE</div>
+        <div class="error-subtitle" id="errorSubtitle" style="display: none;">TASK 3 SOCIAL PROVENANCE NOT ESTABLISHED</div>
         <div class="error-reason" id="errorReason">Detailed failure reason</div>
         <div class="error-action" id="errorAction">Recommended action</div>
+        <div class="error-btn-wrap" style="margin-top: 10px;">
+          <button type="button" id="errorNewVerificationBtn" class="btn btn-secondary btn-sm">
+            <span class="btn-icon">↺</span> NEW VERIFICATION
+          </button>
+        </div>
       </div>
     </div>
 
